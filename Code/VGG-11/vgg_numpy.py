@@ -77,25 +77,16 @@ class VGG_11(nn.Module):
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=maxpool_kernel,stride=maxpool_stride), 
             
-            #nn.Flatten(0,-1),
+            nn.Flatten(),
             
-            #nn.Linear(512*bth_size, out_size)
+            nn.Linear(512, out_size)
             
         )
         
-     
-        self.fullyConnLayer = nn.Sequential(
-            nn.Linear(512, out_size),
-            #nn.Softmax(dim=1)
-        )
             
         
     def forward(self,x):
             out = self.convLayer(x)
-
-            out = out.reshape(out.size(0), -1)
-            
-            out = self.fullyConnLayer(out)
             
             return out 
         
