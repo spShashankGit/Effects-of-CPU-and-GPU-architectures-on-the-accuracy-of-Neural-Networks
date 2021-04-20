@@ -2,7 +2,11 @@
 import os
 import platform
 import pickle
+
 import numpy as np
+from numpy import asarray
+from numpy import save
+from numpy import load
 
 import torch  
 import torch.nn as nn
@@ -129,14 +133,17 @@ def load_CIFAR10(ROOT):
     return Xtr, Ytr, Xte, Yte
 
 
-def get_CIFAR10_data(num_training=49000, num_validation=1000, num_test=10000):
+def get_CIFAR10_data(num_training=49000, num_validation=0, num_test=10000):
     # Load the raw CIFAR-10 data
     dirname = os.path.dirname(__file__)
     cifar10_dir = 'CIFAR-10-DS/cifar-10-batches-py/'
     filename = os.path.join(dirname, cifar10_dir)
     
     X_train, y_train, X_test, y_test = load_CIFAR10(filename)
+    print('X test size', (X_test.shape)[0])
+    num_training=X_train.shape[0]
 
+    num_test=X_test.shape[0]
     # Subsample the data
     mask = range(num_training, num_training + num_validation)
     X_val = X_train[mask]
@@ -157,7 +164,34 @@ def get_CIFAR10_data(num_training=49000, num_validation=1000, num_test=10000):
     #return X_train, y_train, X_test, y_test
     #return x_train, y_train, X_val, y_val, x_test, y_test 
 
-    return x_train, y_train, x_test, y_test 
+    #Save dataset in npy files
+    save('train_data.npy', x_train)
+    save('train_label.npy', y_train)
+
+    save('test_data.npy', x_test)
+    save('test_label.npy', y_test)
+
+    # Shuffle data after loading from npy files
+    x_train = load('train_data.npy')
+    y_train = load('train_label.npy')
+
+    x_test = load('test_data.npy')
+    y_test = load('test_label.npy')
+
+
+    np.random.shuffle(x_train)
+    np.random.shuffle(x_train)
+    np.random.shuffle(x_train)
+    np.random.shuffle(x_train)
+
+    # Save the shuffled dataset
+    save('train_data.npy', x_train)
+    save('train_label.npy', y_train)
+
+    save('test_data.npy', x_test)
+    save('test_label.npy', y_test)
+
+    #return x_train, y_train, x_test, y_test 
 
 
 #Create custom size batches of the dataset
@@ -208,7 +242,7 @@ def trainNetwork(max_epoch, x_train_tensor,y_train_tensor,optimizer,lossFun):
             running_loss += loss.item()
             
             # print statistics        
-            if i % 200 == 199:    # print every 200 mini-batches
+            if i % 100 == 99:    # print every 200 mini-batches
                 print('[%d, %5d] loss: %.3f' %
                     (epoch + 1, i + 1, running_loss / 200))
                 running_loss = 0.0
@@ -263,14 +297,28 @@ def saveTrainedModel(name):
 #TO-DO
 def main():
     print('Main called')
-    max_epoch_num = 1               # Maximun numbe of epochs
+    max_epoch_num = 5               # Maximun numbe of epochs
     #Get train and test dataset
-    x_train, y_train, x_test, y_test = get_CIFAR10_data()
+    #x_train, y_train, x_test, y_test = get_CIFAR10_data()
+    get_CIFAR10_data()
+
+    #print ('Check here')
+
+    # Load dataset from npy files
+    x_train = load('train_data.npy')
+    y_train = load('train_label.npy')
+
+    x_test = load('test_data.npy')
+    y_test = load('test_label.npy')
+    
+    print ('Before', x_train.shape)
 
     #Divide the dataset into small batches
     batch_size = 64
     x_train = createBatches(x_train,batch_size)
     y_train = createBatches(y_train,batch_size)
+
+    print ('After', x_train.shape)
 
     x_test = createBatches(x_test,batch_size)
     y_test = createBatches(y_test,batch_size)
