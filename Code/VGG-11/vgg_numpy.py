@@ -133,7 +133,7 @@ def load_CIFAR10(ROOT):
     return Xtr, Ytr, Xte, Yte
 
 
-def get_CIFAR10_data(num_training=49000, num_validation=1000, num_test=10000):
+def get_CIFAR10_data(num_training=49000, num_validation=0, num_test=10000):
     # Load the raw CIFAR-10 data
     dirname = os.path.dirname(__file__)
     cifar10_dir = 'CIFAR-10-DS/cifar-10-batches-py/'
@@ -141,9 +141,9 @@ def get_CIFAR10_data(num_training=49000, num_validation=1000, num_test=10000):
     
     X_train, y_train, X_test, y_test = load_CIFAR10(filename)
     print('X test size', (X_test.shape)[0])
-    #num_training=X_train.shape[0]
+    num_training=X_train.shape[0]
 
-    #num_test=X_test.shape[0]
+    num_test=X_test.shape[0]
     # Subsample the data
     mask = range(num_training, num_training + num_validation)
     X_val = X_train[mask]
