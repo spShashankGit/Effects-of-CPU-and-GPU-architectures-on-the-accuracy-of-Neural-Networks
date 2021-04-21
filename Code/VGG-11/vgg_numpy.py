@@ -133,7 +133,7 @@ def load_CIFAR10(ROOT):
     return Xtr, Ytr, Xte, Yte
 
 
-def get_CIFAR10_data(num_training=49000, num_validation=0, num_test=10000):
+def get_CIFAR10_data(num_training=49000, num_validation=1000, num_test=10000):
     # Load the raw CIFAR-10 data
     dirname = os.path.dirname(__file__)
     cifar10_dir = 'CIFAR-10-DS/cifar-10-batches-py/'
@@ -141,9 +141,9 @@ def get_CIFAR10_data(num_training=49000, num_validation=0, num_test=10000):
     
     X_train, y_train, X_test, y_test = load_CIFAR10(filename)
     print('X test size', (X_test.shape)[0])
-    num_training=X_train.shape[0]
+    #num_training=X_train.shape[0]
 
-    num_test=X_test.shape[0]
+    #num_test=X_test.shape[0]
     # Subsample the data
     mask = range(num_training, num_training + num_validation)
     X_val = X_train[mask]
@@ -178,18 +178,13 @@ def get_CIFAR10_data(num_training=49000, num_validation=0, num_test=10000):
     x_test = load('test_data.npy')
     y_test = load('test_label.npy')
 
-
-    np.random.shuffle(x_train)
-    np.random.shuffle(x_train)
-    np.random.shuffle(x_train)
-    np.random.shuffle(x_train)
+    data = list(zip(x_train, y_train))
+    np.random.shuffle(data)
+    x_train, y_train = zip(*data)
 
     # Save the shuffled dataset
     save('train_data.npy', x_train)
     save('train_label.npy', y_train)
-
-    save('test_data.npy', x_test)
-    save('test_label.npy', y_test)
 
     #return x_train, y_train, x_test, y_test 
 
@@ -294,15 +289,13 @@ def saveTrainedModel(name):
     torch.save(vgg_11.state_dict(), PATH)
 
 
-#TO-DO
+#Main function
 def main():
     print('Main called')
-    max_epoch_num = 5               # Maximun numbe of epochs
+    max_epoch_num = 1               # Maximun numbe of epochs
     #Get train and test dataset
     #x_train, y_train, x_test, y_test = get_CIFAR10_data()
     get_CIFAR10_data()
-
-    #print ('Check here')
 
     # Load dataset from npy files
     x_train = load('train_data.npy')
