@@ -11,20 +11,23 @@ The repo consists of following codes to run:-
 
 
 
-Logistic Map code is available at this path:-
+<br></br>
+## Logistic Map code is available at this path:-
 
-`cd Code/Logistic\ Map/`
+    cd Code/Logistic\ Map/
+
 
 Run 
 
-```python3  Logistic_Map_Script.py```
+    python3  Logistic_Map_Script.py
 
-Image classification code is available at this path:-
+<br></br>
+## Image classification code is available at this path:-
 
-`cd Code/VGG-11`
+    cd Code/VGG-11
 
 
 
 Run
 
-```python3 vgg_numpy.py```
+    python3 vgg_numpy.py
