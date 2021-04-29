@@ -1,3 +1,6 @@
+from datetime import datetime
+begin_time = datetime.now()     
+
 # CIFAR 10 dataset - Numpy
 import os
 import platform
@@ -314,6 +317,8 @@ def main():
     optimizer=useOptimizerFunction('optim')
     trainNetwork(max_epoch_num, x_train_tensor,y_train_tensor,optimizer,criterion)
     AccuracyOfIndividualClassesAndDataset(x_test_tensor,y_test_tensor,batch_size)
+
+    print('Time required to run the  file', datetime.now() - begin_time)
 
 if __name__ == "__main__":
     # execute only if run as a script
