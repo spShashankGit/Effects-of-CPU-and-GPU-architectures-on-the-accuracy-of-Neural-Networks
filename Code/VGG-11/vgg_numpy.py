@@ -270,7 +270,7 @@ def AccuracyOfIndividualClassesAndDataset(x_test_t,y_test_t,bs):
         print('Accuracy of %5s : %.2f %%' % (
             classes[i], 100 * class_correct[i] / class_total[i]))
     
-    print('Accuracy of the network on the %d test images: %d %%' % (len(y_test_t)*bs,100 * correct / total))
+    print('Accuracy of the network on the %d test images: %.2f %%' % (len(y_test_t)*bs,100 * correct / total))
 
 def saveTrainedModel(name):
     if (name):
