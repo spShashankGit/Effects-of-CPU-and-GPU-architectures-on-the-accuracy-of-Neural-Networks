@@ -284,11 +284,10 @@ def saveTrainedModel(name):
 
 #Main function
 def main():
-    print('Main called')
     max_epoch_num = 1               # Maximun numbe of epochs
     
     #Get train and test dataset
-    get_CIFAR10_data()
+    #get_CIFAR10_data()
 
     # Load dataset from npy files
     x_train = load('train_data.npy')
