@@ -206,9 +206,18 @@ def useLossFunction():
     return criterion
 
 def useOptimizerFunction(name):
+    learning_rate = 0.01                        # Learning rate
+    momentum_val = 0.9                          # Momentum value
+
     optimizer=''
-    if(name == 'optim'):
+    if(name == 'Adadelta'):
         optimizer = optim.Adadelta(vgg_11.parameters())
+
+    elif(name=='SGD'):
+        optimizer = optim.SGD(vgg_11.parameters(), lr=learning_rate, momentum=momentum_val)
+    
+    elif(name=='NAG'):
+        optimizer = optim.SGD(params, lr=learning_rate, momentum=0, dampening=0, weight_decay=0, nesterov=True)
 
     return optimizer
 
@@ -313,9 +322,22 @@ def main():
     y_test_tensor = torch.as_tensor(y_test)
 
     criterion = useLossFunction()
-    optimizer=useOptimizerFunction('optim')
+
+    # Adadelta Optimizer
+    optimizer=useOptimizerFunction('Adadelta')
     trainNetwork(max_epoch_num, x_train_tensor,y_train_tensor,optimizer,criterion)
     AccuracyOfIndividualClassesAndDataset(x_test_tensor,y_test_tensor,batch_size)
+
+    # SGD Optimizer
+    optimizer=useOptimizerFunction('SGD')
+    trainNetwork(max_epoch_num, x_train_tensor,y_train_tensor,optimizer,criterion)
+    AccuracyOfIndividualClassesAndDataset(x_test_tensor,y_test_tensor,batch_size)
+
+    # NAG optimzer
+    optimizer=useOptimizerFunction('NAG')
+    trainNetwork(max_epoch_num, x_train_tensor,y_train_tensor,optimizer,criterion)
+    AccuracyOfIndividualClassesAndDataset(x_test_tensor,y_test_tensor,batch_size)
+
 
     print('Time required to run the  file', datetime.now() - begin_time)
 
