@@ -217,7 +217,7 @@ def useOptimizerFunction(name):
         optimizer = optim.SGD(vgg_11.parameters(), lr=learning_rate, momentum=momentum_val)
     
     elif(name=='NAG'):
-        optimizer = optim.SGD(params, lr=learning_rate, momentum=0, dampening=0, weight_decay=0, nesterov=True)
+        optimizer = optim.SGD(vgg_11.parameters(), lr=learning_rate, momentum=momentum_val, dampening=0, weight_decay=0, nesterov=True)
 
     return optimizer
 
