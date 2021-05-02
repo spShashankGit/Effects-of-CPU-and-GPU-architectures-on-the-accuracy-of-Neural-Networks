@@ -3,6 +3,10 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 
+# Initializing pypads
+from pypads.app.base import pypads
+print('CP 1')
+
 
 # Initialize CPU
 
