@@ -13,7 +13,7 @@ import os
 path = os.path.expanduser('~')
 
 tracker = PyPads( autostart=True)
-tracker.start_track(experiment_name="Effect of GPUs")
+tracker.start_track(experiment_name="Effect of GPUs - Logistic map")
 print('CP 2')
 #PyPads(autostart=True)
 
@@ -52,11 +52,11 @@ print('Success ', score_cpu)
 
 
 ## ---------------------------------------------------------------- Torch -----------------------------------------------------------------##
-"""
+
 # Initialize tensor on CPU
 
 # Import Torch related libraries
-#import torch
+import torch
 
 score_pytorch_cpu = torch.empty((max_iteration,1),dtype=torch.float32, device="cpu") # Tensor store on CPU, to conatain Xn and Xn+1
 
@@ -89,4 +89,3 @@ score_pytorch_gpu = torch.empty((max_iteration,1),dtype=torch.float32)          
 
 
 logisticMapPyTorch(x_init, score_pytorch_gpu)                                       # Calling Logistic_Map function with initial values
-"""
