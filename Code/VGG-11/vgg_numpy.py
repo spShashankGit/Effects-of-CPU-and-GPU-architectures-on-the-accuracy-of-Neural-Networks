@@ -1,3 +1,4 @@
+from pypads.app.base import PyPads
 from datetime import datetime  
 
 # CIFAR 10 dataset - Numpy
@@ -13,6 +14,13 @@ from numpy import load
 import torch  
 import torch.nn as nn
 import torch.optim as optim
+
+import os
+path = os.path.expanduser('~')
+
+# Initializing pypads
+tracker = PyPads( autostart=True)
+tracker.start_track(experiment_name="Effect of GPUs - Logistic map")
 
 torch.manual_seed(0)                                 # to set same random number to all devices [4]
 
