@@ -8,14 +8,20 @@ mkdir $APP_NAME
 cd $APP_NAME
 
 # Create and activate conda env with with python 3.6
-conda create -n thesisExpCondaEnv python=3.6
-conda activate thesisExpCondaEnv 
+#conda create -n thesisExpCondaEnv python=3.6
+#conda activate thesisExpCondaEnv 
+
+conda create -n thesisExpCondaEnv_P38 python=3.8
+conda activate thesisExpCondaEnv_P38
 
 # Install conda packages from the req file
 conda install --file requirements_gpuInfoLogger1.txt -y
 
 # Install pycuda via pip
 python3 -m pip install pycuda==2020.1
+
+# Install pytorch 
+conda install -c pytorch pytorch 
 
 # Set environment variables for pypads logging
 export MONGO_DB=pypads
