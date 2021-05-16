@@ -13,7 +13,6 @@ path = os.path.expanduser('~')
 
 tracker = PyPads( autostart=True)
 tracker.start_track(experiment_name="Effect of GPUs - Logistic map")
-print('CP 2')
 #PyPads(autostart=True)
 
 
