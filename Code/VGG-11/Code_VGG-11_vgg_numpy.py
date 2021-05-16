@@ -12,6 +12,8 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 
+torch.manual_seed(0)                                 # to set same random number to all devices [4]
+
 class VGG_11(nn.Module):
     
     def __init__(self):
