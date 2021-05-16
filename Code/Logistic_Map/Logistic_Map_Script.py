@@ -1,5 +1,4 @@
 from pypads.app.base import PyPads
-print('CP 1')
 
 import pandas as pd
 #import matplotlib.pyplot as plt
