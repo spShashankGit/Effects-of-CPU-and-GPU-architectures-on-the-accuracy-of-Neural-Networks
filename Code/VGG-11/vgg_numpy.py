@@ -2,7 +2,7 @@ from pypads.app.base import PyPads
 from datetime import datetime  
 
 # CIFAR 10 dataset - Numpy
-import os
+#import os
 import platform
 import pickle
 
@@ -14,15 +14,6 @@ from numpy import load
 import torch  
 import torch.nn as nn
 import torch.optim as optim
-
-import os
-path = os.path.expanduser('~')
-
-# Initializing pypads
-tracker = PyPads( autostart=True)
-tracker.start_track(experiment_name="Effect of GPUs - Logistic map")
-
-torch.manual_seed(0)                                 # to set same random number to all devices [4]
 
 class VGG_11(nn.Module):
     
@@ -315,6 +306,13 @@ def saveTrainedModel(name):
 def main():
 
     begin_time = datetime.now()   
+
+    # Initializing pypads
+    tracker = PyPads( autostart=True)
+    tracker.start_track(experiment_name="Effect of GPUs - VGG 11")
+
+    torch.manual_seed(0)            # to set same random number to all devices [4]
+
     device = torch.device("cpu")
     max_epoch_num = 1               # Maximun numbe of epochs
     
