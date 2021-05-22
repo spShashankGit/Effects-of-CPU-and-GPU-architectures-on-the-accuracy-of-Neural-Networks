@@ -228,6 +228,7 @@ def useOptimizerFunction(name):
     return optimizer
 
 def trainNetwork(max_epoch, x_train_tensor,y_train_tensor,optimizer,lossFun,dev):
+    print('dev ', dev)
     for epoch in range(max_epoch):  # loop over the dataset multiple times
 
         running_loss = 0.0
@@ -236,6 +237,7 @@ def trainNetwork(max_epoch, x_train_tensor,y_train_tensor,optimizer,lossFun,dev)
             inputs = data
             labels = y_train_tensor[i]
             optimizer.zero_grad()
+
             outputs = vgg_11(inputs)
             
             labels = labels.to(device=dev, dtype=torch.int64)
@@ -254,6 +256,46 @@ def trainNetwork(max_epoch, x_train_tensor,y_train_tensor,optimizer,lossFun,dev)
                 running_loss = 0.0
 
     print('Finished Training')
+
+def trainNetworkOnGPU(max_epoch, x_train_tensor,y_train_tensor,optimizer,lossFun,dev):
+    print('dev ', dev)
+
+    if(dev.type == "cuda"):
+        for epoch in range(max_epoch):  # loop over the dataset multiple times
+
+            running_loss = 0.0
+            for i, data in enumerate(x_train_tensor, 0):
+
+                inputs = data
+                #input.cuda()
+
+                labels = y_train_tensor[i]
+                labels.cuda()
+
+                optimizer.zero_grad()
+
+                vgg_11_gpu = vgg_11.cuda()
+                outputs = vgg_11_gpu(inputs)
+                
+                labels = labels.to(device=dev, dtype=torch.int64)
+                
+                loss = lossFun(outputs, labels)
+                loss.backward()
+                optimizer.step()
+
+                running_loss += loss.item()
+                
+                # print statistics        
+                if i % 100 == 99:    # print every 100 mini-batches
+                    print('[%d, %5d] loss: %.3f' %
+                        (epoch + 1, i + 1, running_loss / 100))
+
+                    running_loss = 0.0
+
+        print('Finished Training on GPU')
+    else:
+        print('GPU not present')
+
 
 
 #Accuracy of individual classes and overall dataset
@@ -308,8 +350,8 @@ def main():
     begin_time = datetime.now()   
 
     # Initializing pypads
-    tracker = PyPads( autostart=True)
-    tracker.start_track(experiment_name="Effect of GPUs - VGG 11")
+    #tracker = PyPads( autostart=True)
+    #tracker.start_track(experiment_name="Effect of GPUs - VGG 11")
 
     torch.manual_seed(0)            # to set same random number to all devices [4]
 
@@ -320,11 +362,11 @@ def main():
     #get_CIFAR10_data()
 
     # Load dataset from npy files
-    x_train = load('train_data.npy')
-    y_train = load('train_label.npy')
+    x_train = load('/home/rgb/Documents/Thesis_Git/effects-of-cpu-and-gpu-architectures-on-the-accuracy-of-neural-networks/Code/VGG-11/train_data.npy')
+    y_train = load('/home/rgb/Documents/Thesis_Git/effects-of-cpu-and-gpu-architectures-on-the-accuracy-of-neural-networks/Code/VGG-11/train_label.npy')
 
-    x_test = load('test_data.npy')
-    y_test = load('test_label.npy')
+    x_test = load('/home/rgb/Documents/Thesis_Git/effects-of-cpu-and-gpu-architectures-on-the-accuracy-of-neural-networks/Code/VGG-11/test_data.npy')
+    y_test = load('/home/rgb/Documents/Thesis_Git/effects-of-cpu-and-gpu-architectures-on-the-accuracy-of-neural-networks/Code/VGG-11/test_label.npy')
     
     #Divide the dataset into small batches
     batch_size = 64
@@ -345,19 +387,19 @@ def main():
     criterion = useLossFunction()
 
     # Adadelta Optimizer
-    optimizer=useOptimizerFunction('Adadelta')
-    trainNetwork(max_epoch_num, x_train_tensor,y_train_tensor,optimizer,criterion,device)
-    AccuracyOfIndividualClassesAndDataset(x_test_tensor,y_test_tensor,batch_size)
+    # optimizer=useOptimizerFunction('Adadelta')
+    # trainNetwork(max_epoch_num, x_train_tensor,y_train_tensor,optimizer,criterion,device)
+    # AccuracyOfIndividualClassesAndDataset(x_test_tensor,y_test_tensor,batch_size)
 
-    # SGD Optimizer
-    optimizer=useOptimizerFunction('SGD')
-    trainNetwork(max_epoch_num, x_train_tensor,y_train_tensor,optimizer,criterion,device)
-    AccuracyOfIndividualClassesAndDataset(x_test_tensor,y_test_tensor,batch_size)
+    # # SGD Optimizer
+    # optimizer=useOptimizerFunction('SGD')
+    # trainNetwork(max_epoch_num, x_train_tensor,y_train_tensor,optimizer,criterion,device)
+    # AccuracyOfIndividualClassesAndDataset(x_test_tensor,y_test_tensor,batch_size)
 
-    # NAG optimzer
-    optimizer=useOptimizerFunction('NAG')
-    trainNetwork(max_epoch_num, x_train_tensor,y_train_tensor,optimizer,criterion,device)
-    AccuracyOfIndividualClassesAndDataset(x_test_tensor,y_test_tensor,batch_size)
+    # # NAG optimzer
+    # optimizer=useOptimizerFunction('NAG')
+    # trainNetwork(max_epoch_num, x_train_tensor,y_train_tensor,optimizer,criterion,device)
+    # AccuracyOfIndividualClassesAndDataset(x_test_tensor,y_test_tensor,batch_size)
 
 
     print('Time required to run the model on CPU is', datetime.now() - begin_time)
@@ -368,13 +410,13 @@ def main():
         
         device = torch.device('cuda')  
         # Load data from the numpy files into tensor which are stored on GPU
-        x_train_gpu = torch.FloatTensor(load('./train_data.npy')).cuda()
-        y_train_gpu = torch.FloatTensor(load('train_label.npy')).cuda()
-        x_test_gpu = torch.FloatTensor(load('test_data.npy')).cuda()
-        y_test_gpu = torch.FloatTensor(load('test_label.npy')).cuda()
+        x_train_gpu = torch.FloatTensor(load('/home/rgb/Documents/Thesis_Git/effects-of-cpu-and-gpu-architectures-on-the-accuracy-of-neural-networks/Code/VGG-11/train_data.npy')).cuda()
+        y_train_gpu = torch.FloatTensor(load('/home/rgb/Documents/Thesis_Git/effects-of-cpu-and-gpu-architectures-on-the-accuracy-of-neural-networks/Code/VGG-11/train_label.npy')).cuda()
+        x_test_gpu = torch.FloatTensor(load('/home/rgb/Documents/Thesis_Git/effects-of-cpu-and-gpu-architectures-on-the-accuracy-of-neural-networks/Code/VGG-11/test_data.npy')).cuda()
+        y_test_gpu = torch.FloatTensor(load('/home/rgb/Documents/Thesis_Git/effects-of-cpu-and-gpu-architectures-on-the-accuracy-of-neural-networks/Code/VGG-11/test_label.npy')).cuda()
 
         #Store model on GPU
-        vgg_11 = vgg_11.cuda()
+        #vgg_11 = VGG_11.cuda()
 
         #Divide the dataset into small batches'
         x_train_gpu = createBatches(x_train_gpu,batch_size, "cuda")
@@ -386,17 +428,17 @@ def main():
 
         # Adadelta Optimizer - GPU
         optimizer=useOptimizerFunction('Adadelta')
-        trainNetwork(max_epoch_num, x_train_gpu,y_train_gpu,optimizer,criterion,device)
+        trainNetworkOnGPU(max_epoch_num, x_train_gpu,y_train_gpu,optimizer,criterion,device)
         AccuracyOfIndividualClassesAndDataset(x_test_gpu,y_test_gpu,batch_size)
 
         # SGD Optimizer - GPU
         optimizer=useOptimizerFunction('SGD')
-        trainNetwork(max_epoch_num, x_train_gpu,y_train_gpu,optimizer,criterion,device)
+        trainNetworkOnGPU(max_epoch_num, x_train_gpu,y_train_gpu,optimizer,criterion,device)
         AccuracyOfIndividualClassesAndDataset(x_test_gpu,y_test_gpu,batch_size)
 
         # NAG optimzer - GPU
         optimizer=useOptimizerFunction('NAG')
-        trainNetwork(max_epoch_num, x_train_gpu,y_train_gpu,optimizer,criterion,device)
+        trainNetworkOnGPU(max_epoch_num, x_train_gpu,y_train_gpu,optimizer,criterion,device)
         AccuracyOfIndividualClassesAndDataset(x_test_gpu,y_test_gpu,batch_size)
         print('Time required to run the model on GPU is', datetime.now() - begin_time)
 
