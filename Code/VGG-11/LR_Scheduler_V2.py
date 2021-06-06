@@ -1,4 +1,4 @@
-from pypads.app.base import PyPads
+#from pypads.app.base import PyPads
 from datetime import datetime  
 
 # CIFAR 10 dataset - Numpy
@@ -14,6 +14,7 @@ from numpy import load
 import torch  
 import torch.nn as nn
 import torch.optim as optim
+#import torch.lr
 
 import matplotlib.pyplot as plt
 
@@ -275,6 +276,11 @@ def trainNetworkOnGPU(max_epoch, x_train_tensor,y_train_tensor,optimizer,lossFun
     #print('dev ', dev)
     loss_value = []
     if(dev.type == "cuda"):
+
+        # gamma = 0.5 [50,100,125]
+        # gamma = 0.5 [50,75,100,125]
+        # gamma =  [0.5, 0.6]
+        scheduler = optim.lr_scheduler.MultiStepLR(optimizer, milestones=[50,75,100,125], gamma=0.4)
         for epoch in range(max_epoch):  # loop over the dataset multiple times
 
             running_loss = 0.0
@@ -305,6 +311,7 @@ def trainNetworkOnGPU(max_epoch, x_train_tensor,y_train_tensor,optimizer,lossFun
                     
                     #running_loss = 0.0
             print('Loss:', epoch, ":", (running_loss/i))
+            scheduler.step()
             
 
         print('Finished Training on GPU')
@@ -314,8 +321,8 @@ def trainNetworkOnGPU(max_epoch, x_train_tensor,y_train_tensor,optimizer,lossFun
 
 
 #Accuracy of individual classes and overall dataset
-def AccuracyOfIndividualClassesAndDataset(x_test_t,y_test_t,bs,vgg):
-    
+def AccuracyOfIndividualClassesAndDataset(x_test_t,y_test_t,bs,vgg,msg):
+    print(msg)
     classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
     correct = 0
     total = 0
@@ -342,12 +349,19 @@ def AccuracyOfIndividualClassesAndDataset(x_test_t,y_test_t,bs,vgg):
                 class_correct[int(label.item())] += c[i].item()
                 class_total[int(label.item())] += 1
 
-
+    accuracyFileName = "Accuracy_of_model" + str(datetime.now())+'.txt'
+    file2write=open(accuracyFileName,'w')
+    file2write.write(str(msg + '\n'))
     for i in range(10):
-        print('Accuracy of %5s : %.2f %%' % (
-            classes[i], 100 * class_correct[i] / class_total[i]))
+        #print('Accuracy of %5s : %.2f %%' % (
+        #    classes[i], 100 * class_correct[i] / class_total[i]))
+        file2write.write(str('Accuracy of %5s : %.2f %% \n' % (
+            classes[i], 100 * class_correct[i] / class_total[i])))
     
     print('Accuracy of the network on the %d test images: %.2f %%' % (len(y_test_t)*bs,100 * correct / total))
+    file2write.write(('Accuracy of the network on the %d test images: %.2f %% \n' % (len(y_test_t)*bs,100 * correct / total)))
+    #file2write.write(str(pltdata))
+    file2write.close()
 
 
 def main():
@@ -355,8 +369,8 @@ def main():
     #begin_time = datetime.now()   
 
     # Initializing pypads
-    tracker = PyPads( autostart=True)
-    tracker.start_track(experiment_name="Effect of GPUs - LR Scheduler Experiment")
+    #tracker = PyPads( autostart=True)
+    #tracker.start_track(experiment_name="Effect of GPUs - LR Scheduler Experiment")
 
     torch.manual_seed(0)            # to set same random number to all devices [4]
 
@@ -377,8 +391,9 @@ def main():
     if (torch.cuda.is_available()):
 
         device = torch.device('cuda')  
-        learning_rate_list= [0.01, 0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9]
-        #learning_rate_list= [0.01, 0.02] 
+        #learning_rate_list= [0.01, 0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9]
+        #learning_rate_list= [0.01, 0.02]
+        learning_rate_list= [0.1] 
         for i,data in enumerate(learning_rate_list):
 
 
@@ -405,15 +420,15 @@ def main():
 
             criterion = useLossFunction()
 
-            AccuracyOfIndividualClassesAndDataset(x_test_gpu,y_test_gpu,batch_size,vggGpu)
+            AccuracyOfIndividualClassesAndDataset(x_test_gpu,y_test_gpu,batch_size,vggGpu, "Before")
 
             optimizer = useOptimizerFunction('SGD',vggGpu, learning_rate=data)
-            
+
             pltdata = trainNetworkOnGPU(max_epoch_num, x_train_gpu,y_train_gpu,optimizer,criterion,device,vggGpu)
             file2write.write(str(pltdata))
             file2write.close()
 
-            AccuracyOfIndividualClassesAndDataset(x_test_gpu,y_test_gpu,batch_size,vggGpu)
+            AccuracyOfIndividualClassesAndDataset(x_test_gpu,y_test_gpu,batch_size,vggGpu, "After")
             avgDeno = len(pltdata)/max_epoch_num
 
             avg = 0
@@ -435,3 +450,11 @@ def main():
 if __name__ == "__main__":
     # execute only if run as a script
     main()
+
+
+# LR = 0.1
+# gamma = 0.5 [50,100,125]
+# gamma = 0.5 [50,75,100,125]
+# Better accuracy 
+# pypads results
+# intial seed (0)
