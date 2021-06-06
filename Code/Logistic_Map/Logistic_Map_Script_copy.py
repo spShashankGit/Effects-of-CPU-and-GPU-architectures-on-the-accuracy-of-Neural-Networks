@@ -3,10 +3,6 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 
-# Initializing pypads
-from pypads.app.base import pypads
-print('CP 1')
-
 
 # Initialize CPU
 
@@ -65,7 +61,7 @@ def logisticMapPyTorch(x, res):
         x = res[i]
     #return res
 
-logisticMapPyTorch(x_init, score_pytorch_cpu)                                       # Calling Logistic Map function with initial values
+logisticMapPyTorch(x_init, score_pytorch_cpu)                                       # Calling Logistic_Map function with initial values
 
 
 
@@ -79,4 +75,4 @@ if (torch.cuda.is_available()):
 score_pytorch_gpu = torch.empty((max_iteration,1),dtype=torch.float32)              # Tensor store on CPU, to conatain Xn and Xn+1
 
 
-logisticMapPyTorch(x_init, score_pytorch_gpu)                                       # Calling Logistic Map function with initial values
+logisticMapPyTorch(x_init, score_pytorch_gpu)                                       # Calling Logistic_Map function with initial values
