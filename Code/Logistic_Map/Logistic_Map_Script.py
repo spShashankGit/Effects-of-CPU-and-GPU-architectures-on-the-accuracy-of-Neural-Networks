@@ -1,4 +1,5 @@
 from pypads.app.base import PyPads
+import mlflow
 
 import pandas as pd
 #import matplotlib.pyplot as plt
@@ -9,10 +10,11 @@ import numpy as np
 #from pypads.arguments import PYPADS_FOLDER
 
 import os
+import subprocess
 path = os.path.expanduser('~')
 
 tracker = PyPads( autostart=True)
-tracker.start_track(experiment_name="Effect of GPUs - Logistic map")
+tracker.start_track(experiment_name="Effect of GPUs - Logistic map - stg7")
 #PyPads(autostart=True)
 
 
@@ -47,8 +49,13 @@ def logisticMapCPU(x,score):
 
 score_cpu = logisticMapCPU(x_init,score_cpu)
 print('Success ', score_cpu)
+mlflow.log_metric("CPU Score", 89)
 
-
+subprocess_return = subprocess.getoutput('conda list | grep cudnn')
+subprocess_return = (subprocess_return.split()[1])
+print('123 ',subprocess_return)
+#mlflow.log_metric("CuDNN version", str(subprocess_return))
+mlflow.log_params({"cuDNN version":subprocess_return})
 ## ---------------------------------------------------------------- Torch -----------------------------------------------------------------##
 
 # Initialize tensor on CPU
