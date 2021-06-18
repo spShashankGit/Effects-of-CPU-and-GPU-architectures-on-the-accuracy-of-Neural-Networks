@@ -29,4 +29,10 @@ export MONGO_USER=pypads
 export MONGO_URL=mongodb://www.padre-lab.eu:2222
 export MONGO_PW=8CN7OqknwhYr3RO
 
+export MONGO_DB=pypads;
+export MONGO_USER=pypads;
+export MONGO_URL=mongodb://ilz.dimis.fim.uni-passau.de:29642;
+export MONGO_PW=8CN7OqknwhYr3RO;
+
+# Now install pypads from dist
 echo "Script finished"
