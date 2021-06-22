@@ -1,4 +1,4 @@
-from pypads.app.base import PyPads
+#from pypads.app.base import PyPads
 from datetime import datetime  
 
 # CIFAR 10 dataset - Numpy
@@ -14,6 +14,7 @@ from numpy import load
 import torch  
 import torch.nn as nn
 import torch.optim as optim
+#import torch.lr
 
 import matplotlib.pyplot as plt
 
@@ -85,8 +86,10 @@ class VGG_11(nn.Module):
             nn.Conv2d(hid4_size,hid4_size,k_conv_size, stride=conv_stride, padding=conv_pad),
             nn.BatchNorm2d(hid4_size),
             nn.ReLU(),
+            #TO-DO
             nn.MaxPool2d(kernel_size=maxpool_kernel,stride=maxpool_stride), 
-            
+            #nn.AvgPooling2d(kernel_size=maxpool_kernel,stride=maxpool_stride),
+            #512
             nn.Flatten(),
             
             nn.Linear(512, out_size)
@@ -217,25 +220,31 @@ def useLossFunction():
     criterion = nn.CrossEntropyLoss()
     return criterion
 
-
-def useOptimizerFunction(name, vgg11Optim, learning_rate=0.01, momentum_val = 0.9):
+def useOptimizerFunction(name, vgg11Optim, learning_rate=0.1):
     #learning_rate = 0.01                        # Learning rate
-    #momentum_val = 0.9                          # Momentum value
+    #momentum_val = 0.9  - 82.20%                      # Momentum value
+    #momentum_val = 0.8  - 82.68%
+    #momentum_val = 0.7  - 84.04%
+    #momentum_val = 0.6  - 83.38%
+    #momenttum:val = 0.5 - 84.12%
+    #momentum_val = 0.4 -  83.89% - 50,100
+    #momentum_val = 0.3 -  83.57% - last
+    #momentum_val = 0.5
     print('learning rate ', learning_rate)
     optimizer=''
     if(name == 'Adadelta'):
         optimizer = optim.Adadelta(vgg11Optim.parameters())
 
     elif(name=='SGD'):
+        momentum_val = 0.5
+        print('Momentum Val ', momentum_val)
         optimizer = optim.SGD(vgg11Optim.parameters(), lr=learning_rate, momentum=momentum_val)
     
     elif(name=='NAG'):
+        momentum_val = 0.5
         optimizer = optim.SGD(vgg11Optim.parameters(), lr=learning_rate, momentum=momentum_val, dampening=0, weight_decay=0, nesterov=True)
 
     return optimizer
-
-
-
 
 def trainNetwork(max_epoch, x_train_tensor,y_train_tensor,optimizer,lossFun,dev):
     running_loss_arr = []
@@ -275,6 +284,19 @@ def trainNetworkOnGPU(max_epoch, x_train_tensor,y_train_tensor,optimizer,lossFun
     #print('dev ', dev)
     loss_value = []
     if(dev.type == "cuda"):
+
+        # gamma = 0.5 [50,100,125]
+        # gamma = 0.5 [50,75,100,125]
+        # gamma =  [0.5, 0.6]
+        #milestonesValue = [50,100,150]
+        #milestonesValue = [50,70,90,110,130]
+        #milestonesValue = [50,100]
+        milestonesValue = [50,75,100,125]
+        #milestonesValue = [50,100]
+        gammaValue = 0.8
+        scheduler = optim.lr_scheduler.MultiStepLR(optimizer, milestones=milestonesValue, gamma=gammaValue)
+        print('Milestone values are ', milestonesValue)
+        print('Gamma values are ', gammaValue)
         for epoch in range(max_epoch):  # loop over the dataset multiple times
 
             running_loss = 0.0
@@ -305,6 +327,7 @@ def trainNetworkOnGPU(max_epoch, x_train_tensor,y_train_tensor,optimizer,lossFun
                     
                     #running_loss = 0.0
             print('Loss:', epoch, ":", (running_loss/i))
+            scheduler.step()
             
 
         print('Finished Training on GPU')
@@ -314,8 +337,8 @@ def trainNetworkOnGPU(max_epoch, x_train_tensor,y_train_tensor,optimizer,lossFun
 
 
 #Accuracy of individual classes and overall dataset
-def AccuracyOfIndividualClassesAndDataset(x_test_t,y_test_t,bs,vgg):
-    
+def AccuracyOfIndividualClassesAndDataset(x_test_t,y_test_t,bs,vgg,msg):
+    print(msg)
     classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
     correct = 0
     total = 0
@@ -342,12 +365,19 @@ def AccuracyOfIndividualClassesAndDataset(x_test_t,y_test_t,bs,vgg):
                 class_correct[int(label.item())] += c[i].item()
                 class_total[int(label.item())] += 1
 
-
+    accuracyFileName = "Accuracy_of_model" + str(datetime.now())+'.txt'
+    file2write=open(accuracyFileName,'w')
+    file2write.write(str(msg + '\n'))
     for i in range(10):
-        print('Accuracy of %5s : %.2f %%' % (
-            classes[i], 100 * class_correct[i] / class_total[i]))
+        #print('Accuracy of %5s : %.2f %%' % (
+        #    classes[i], 100 * class_correct[i] / class_total[i]))
+        file2write.write(str('Accuracy of %5s : %.2f %% \n' % (
+            classes[i], 100 * class_correct[i] / class_total[i])))
     
     print('Accuracy of the network on the %d test images: %.2f %%' % (len(y_test_t)*bs,100 * correct / total))
+    file2write.write(('Accuracy of the network on the %d test images: %.2f %% \n' % (len(y_test_t)*bs,100 * correct / total)))
+    #file2write.write(str(pltdata))
+    file2write.close()
 
 
 def main():
@@ -355,8 +385,8 @@ def main():
     #begin_time = datetime.now()   
 
     # Initializing pypads
-    tracker = PyPads( autostart=True)
-    tracker.start_track(experiment_name="Effect of GPUs - LR Scheduler Experiment")
+    #tracker = PyPads( autostart=True)
+    #tracker.start_track(experiment_name="Effect of GPUs - LR Scheduler Experiment")
 
     torch.manual_seed(0)            # to set same random number to all devices [4]
 
@@ -365,8 +395,8 @@ def main():
 
 
     #Divide the dataset into small batches
-    batch_size = 150
-
+    batch_size = 64
+    #batch_size = 32
     begin_time = datetime.now()  
 
     x_train_gpu = []
@@ -377,8 +407,9 @@ def main():
     if (torch.cuda.is_available()):
 
         device = torch.device('cuda')  
-        learning_rate_list= [0.01, 0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9]
-        #learning_rate_list= [0.01, 0.02] 
+        #learning_rate_list= [0.01, 0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9]
+        #learning_rate_list= [0.01, 0.02]
+        learning_rate_list= [0.1] 
         for i,data in enumerate(learning_rate_list):
 
 
@@ -405,15 +436,17 @@ def main():
 
             criterion = useLossFunction()
 
-            AccuracyOfIndividualClassesAndDataset(x_test_gpu,y_test_gpu,batch_size,vggGpu)
+            AccuracyOfIndividualClassesAndDataset(x_test_gpu,y_test_gpu,batch_size,vggGpu, "Before")
 
             optimizer = useOptimizerFunction('SGD',vggGpu, learning_rate=data)
-            
+            #optimizer = useOptimizerFunction('Adadelta',vggGpu, learning_rate=data)
+
+
             pltdata = trainNetworkOnGPU(max_epoch_num, x_train_gpu,y_train_gpu,optimizer,criterion,device,vggGpu)
             file2write.write(str(pltdata))
             file2write.close()
 
-            AccuracyOfIndividualClassesAndDataset(x_test_gpu,y_test_gpu,batch_size,vggGpu)
+            AccuracyOfIndividualClassesAndDataset(x_test_gpu,y_test_gpu,batch_size,vggGpu, "After")
             avgDeno = len(pltdata)/max_epoch_num
 
             avg = 0
@@ -423,7 +456,8 @@ def main():
                 if(j%avgDeno==0):
                     avgLossPerEpoch.append(avg)
                     avg = 0
-            plt.figure(figsize=(50, 27))
+            graphTitle = 'Learning Rate = ' + str(data)
+            plt.figure(figsize=(50, 27)).suptitle(graphTitle,fontsize=45)
             plt.plot(avgLossPerEpoch) 
             graphName = 'Graph_'+str(i)+'.png'
             plt.savefig(graphName)
@@ -435,3 +469,11 @@ def main():
 if __name__ == "__main__":
     # execute only if run as a script
     main()
+
+
+# LR = 0.1
+# gamma = 0.5 [50,100,125]
+# gamma = 0.5 [50,75,100,125]
+# Better accuracy 
+# pypads results
+# intial seed (0)

@@ -201,16 +201,21 @@ def get_CIFAR10_data(num_training=49000, num_validation=1000, num_test=10000):
 
 
 #Create custom size batches of the dataset
-def createBatches(data,batch_size_required):
+def createBatches(data,batch_size_required,device="cpu"):
     batch_size = int(len(data)/batch_size_required)
     res=[]
-    #print('Data ',len(data))
+    
     for i in range (batch_size):
         batched_data = data[i*batch_size_required:i*batch_size_required+batch_size_required]
         res.append(batched_data)
-        #print('Check here', len(batched_data))
-    res = np.asarray(res)
-    #print('Res ',len(res))
+
+
+    if (device == "cpu"):
+        res = np.asarray(res)
+
+    elif (device == "cuda"):
+        return res
+    
     return res
 
 
@@ -230,17 +235,14 @@ def trainNetwork(max_epoch, x_train_tensor,y_train_tensor,optimizer,lossFun):
 
         running_loss = 0.0
         for i, data in enumerate(x_train_tensor, 0):
-            #inputs, labels = data
-            
-            #images = data
-            #print(data.shape)
+
             inputs = data
             labels = y_train_tensor[i]
             optimizer.zero_grad()
             outputs = vgg_11(inputs)
             
-            #print(type(outputs))
-            #print(type(labels))
+            labels = labels.to(device=device, dtype=torch.int64)
+            
             loss = lossFun(outputs, labels)
             loss.backward()
             optimizer.step()
@@ -248,9 +250,13 @@ def trainNetwork(max_epoch, x_train_tensor,y_train_tensor,optimizer,lossFun):
             running_loss += loss.item()
             
             # print statistics        
-            if i % 100 == 99:    # print every 200 mini-batches
+            if i % 100 == 99:                                       # print every 100 mini-batches
                 print('[%d, %5d] loss: %.3f' %
-                    (epoch + 1, i + 1, running_loss / 200))
+                    (epoch + 1, i + 1, running_loss / 100))
+                
+                msg = "loss is " + str(running_loss / 100) + " \n"
+                file1.writelines(msg)
+
                 running_loss = 0.0
 
     print('Finished Training')
@@ -280,15 +286,14 @@ def AccuracyOfIndividualClassesAndDataset(x_test_t,y_test_t,bs):
             c = (predicted == labels).squeeze()
             for i in range(4):
                 label = labels[i]
-                class_correct[label] += c[i].item()
-                class_total[label] += 1
-
+                class_correct[int(label.item())] += c[i].item()
+                class_total[int(label.item())] += 1
 
     for i in range(10):
         print('Accuracy of %5s : %.2f %%' % (
             classes[i], 100 * class_correct[i] / class_total[i]))
     
-    print('Accuracy of the network on the %d test images: %d %%' % (len(y_test_t)*bs,100 * correct / total))
+    print('Accuracy of the network on the %d test images: %.2f %%' % (len(y_test_t)*bs,100 * correct / total))
 
 def saveTrainedModel(name):
     if (name):
@@ -303,6 +308,9 @@ def saveTrainedModel(name):
 #TO-DO
 def main():
     print('Main called')
+
+    device = torch.device("cpu")
+
     max_epoch_num = 1               # Maximun numbe of epochs
     #Get train and test dataset
     #x_train, y_train, x_test, y_test = get_CIFAR10_data()
@@ -341,6 +349,51 @@ def main():
     optimizer=useOptimizerFunction('optim')
     trainNetwork(max_epoch_num, x_train_tensor,y_train_tensor,optimizer,criterion)
     AccuracyOfIndividualClassesAndDataset(x_test_tensor,y_test_tensor,batch_size)
+
+    print('Time required to run the  file', datetime.now() - begin_time)
+
+
+    # If GPU is present run the code on the GPU 
+    if (torch.cuda.is_available()):
+        print(torch.cuda.get_device_name(torch.cuda.current_device()))
+        device = torch.device('cuda')                                                     # Setting default CUDA device
+    
+        # Load data from the numpy files into tensor which are stored on GPU
+        x_train_gpu = torch.FloatTensor(load('./train_data.npy')).cuda()
+        y_train_gpu = torch.FloatTensor(load('train_label.npy')).cuda()
+        x_test_gpu = torch.FloatTensor(load('test_data.npy')).cuda()
+        y_test_gpu = torch.FloatTensor(load('test_label.npy')).cuda()
+
+        #Store model on GPU
+        vgg_11 = vgg_11.cuda()
+
+        #Divide the dataset into small batches'
+        x_train_gpu = createBatches(x_train_gpu,batch_size, "cuda")
+        y_train_gpu = createBatches(y_train_gpu,batch_size, "cuda")
+
+        x_test_gpu = createBatches(x_test_gpu,batch_size, "cuda")
+        y_test_gpu = createBatches(y_test_gpu,batch_size, "cuda")
+
+
+        # Adadelta Optimizer - GPU
+        optimizer=useOptimizerFunction('Adadelta')
+        trainNetwork(max_epoch_num, x_train_gpu,y_train_gpu,optimizer,criterion)
+        AccuracyOfIndividualClassesAndDataset(x_test_gpu,y_test_gpu,batch_size)
+
+        # SGD Optimizer - GPU
+        optimizer=useOptimizerFunction('SGD')
+        trainNetwork(max_epoch_num, x_train_gpu,y_train_gpu,optimizer,criterion)
+        AccuracyOfIndividualClassesAndDataset(x_test_gpu,y_test_gpu,batch_size)
+
+        # NAG optimzer
+        optimizer=useOptimizerFunction('NAG')
+        trainNetwork(max_epoch_num, x_train_gpu,y_train_gpu,optimizer,criterion)
+        AccuracyOfIndividualClassesAndDataset(x_test_gpu,y_test_gpu,batch_size)
+
+
+
+
+
 
 if __name__ == "__main__":
     # execute only if run as a script

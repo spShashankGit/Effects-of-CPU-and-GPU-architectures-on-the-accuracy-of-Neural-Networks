@@ -1,0 +1,12 @@
+After
+Accuracy of plane : 94.55 % 
+Accuracy of   car : 90.00 % 
+Accuracy of  bird : 82.28 % 
+Accuracy of   cat : 69.86 % 
+Accuracy of  deer : 81.82 % 
+Accuracy of   dog : 81.03 % 
+Accuracy of  frog : 83.93 % 
+Accuracy of horse : 85.71 % 
+Accuracy of  ship : 89.47 % 
+Accuracy of truck : 88.46 % 
+Accuracy of the network on the 9984 test images: 83.89 % 
