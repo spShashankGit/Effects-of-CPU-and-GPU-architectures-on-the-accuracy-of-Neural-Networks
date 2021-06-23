@@ -215,8 +215,8 @@ def useLossFunction():
 def useOptimizerFunction(name, vgg11Optim, learning_rate=0.1):
     #learning_rate = 0.01                        # Learning rate
     #momentum_val = 0.9                          # Momentum value
-    print('learning rate ', learning_rate)
-    print(' optimizer ', name)
+    print('Learning rate ', learning_rate)
+    print('Optimizer ', name)
     optimizer=''
     if(name == 'Adadelta'):
         optimizer = optim.Adadelta(vgg11Optim.parameters())
@@ -270,7 +270,7 @@ def trainNetwork(max_epoch, x_train_tensor,y_train_tensor,optimizer,lossFun,dev,
             #     #    
                     
             #         #running_loss = 0.0
-        print('Loss:', epoch, ":", (running_loss/i))
+        #print('Loss:', epoch, ":", (running_loss/i))
         scheduler.step()
             
 
@@ -300,8 +300,8 @@ def trainNetworkOnGPU(max_epoch, x_train_tensor,y_train_tensor,optimizer,lossFun
 
                 optimizer.zero_grad()
 
-                vgg_11_gpu = vggInp.cuda()
-                outputs = vgg_11_gpu(inputs)
+                #vgg_11_gpu = vggInp.cuda()
+                outputs = vggInp(inputs)
                 
                 labels = labels.to(device=dev, dtype=torch.int64)
                 
@@ -316,7 +316,7 @@ def trainNetworkOnGPU(max_epoch, x_train_tensor,y_train_tensor,optimizer,lossFun
                 #    
                     
                 #running_loss = 0.0
-            print('Loss:', epoch, ":", (running_loss/i))
+            #print('Loss:', epoch, ":", (running_loss/i))
             scheduler.step()
             
 
@@ -391,7 +391,7 @@ def main():
     torch.manual_seed(0)            # to set same random number to all devices [4]
     batch_size = 64                 # Batch size
     device = torch.device("cpu")    # Set the torch device to CPU for CPU run
-    max_epoch_num = 1             # Maximun numbe of epochs
+    max_epoch_num = 150             # Maximun numbe of epochs
     learning_rate_val = 0.1         # Learning rate
     milestoneVal = [50,75,100,125]  # Milestones values for Learning Rate Scheduler
     gammaVal = 0.8                  # Gamma value the Learning Rate  Scheduler
@@ -435,14 +435,19 @@ def main():
     x_test_tensor = torch.as_tensor(x_test)
     y_test_tensor = torch.as_tensor(y_test)
 
+    torch.manual_seed(0)
+    torch.cuda.manual_seed(0)
+    torch.cuda.manual_seed_all(0)
+    np.random.seed(0)
+
     vggCpu = VGG_11()
 
     # Adadelta Optimizer
-    criterion = useLossFunction()
-    AccuracyOfIndividualClassesAndDataset(x_test_tensor,y_test_tensor,batch_size,vggCpu,'Before')
-    optimizer=useOptimizerFunction('Adadelta',vggCpu, learning_rate=learning_rate_val)
-    trainNetwork(max_epoch_num, x_train_tensor,y_train_tensor,optimizer,criterion,device,vggCpu, milestoneVal,gammaVal)
-    AccuracyOfIndividualClassesAndDataset(x_test_tensor,y_test_tensor,batch_size,vggCpu,'After')
+    # criterion = useLossFunction()
+    # AccuracyOfIndividualClassesAndDataset(x_test_tensor,y_test_tensor,batch_size,vggCpu,'Before')
+    # optimizer=useOptimizerFunction('Adadelta',vggCpu, learning_rate=learning_rate_val)
+    # trainNetwork(max_epoch_num, x_train_tensor,y_train_tensor,optimizer,criterion,device,vggCpu, milestoneVal,gammaVal)
+    # AccuracyOfIndividualClassesAndDataset(x_test_tensor,y_test_tensor,batch_size,vggCpu,'After')
 
     # # SGD Optimizer
     # optimizer=useOptimizerFunction('SGD')
@@ -457,13 +462,17 @@ def main():
 
     print('Time required to run the model on CPU is', datetime.now() - begin_time)
 
+    torch.manual_seed(0)
+    torch.cuda.manual_seed(0)
+    torch.cuda.manual_seed_all(0)
+    np.random.seed(0)
+
     # If GPU is present run the code on the GPU 
     begin_time = datetime.now()  
     if (torch.cuda.is_available()):
         
         print('******GPU experiment starts from here*******')
         device = torch.device('cuda')  
-
         # Load data from the numpy files into tensor which are stored on GPU
         # dirname = os.path.dirname(__file__)
 
@@ -491,8 +500,8 @@ def main():
         #Store model on GPU
         #vgg_11 = VGG_11.cuda()
         #Create model class object and store model on GPU
-        vgg11 = VGG_11()
-        vggGpu = vgg11.cuda()
+        #_vgg11Gpu = VGG_11()
+        vggGpu = VGG_11().cuda()
 
         #Divide the dataset into small batches'
         x_train_gpu = createBatches(x_train_gpu,batch_size, "cuda")
