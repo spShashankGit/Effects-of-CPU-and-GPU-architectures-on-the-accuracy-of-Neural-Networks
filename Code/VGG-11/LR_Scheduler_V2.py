@@ -1,6 +1,5 @@
 #from pypads.app.base import PyPads
 from datetime import datetime  
-
 # CIFAR 10 dataset - Numpy
 import os
 import platform
@@ -279,7 +278,7 @@ def trainNetwork(max_epoch, x_train_tensor,y_train_tensor,optimizer,lossFun,dev)
 
 
 
-def trainNetworkOnGPU(max_epoch, x_train_tensor,y_train_tensor,optimizer,lossFun,dev,vgg):
+def trainNetworkOnGPU(max_epoch, x_train_tensor,y_train_tensor,optimizer,lossFun,dev,vggInp):
     #vgg_11 = VGG_11()
     #print('dev ', dev)
     loss_value = []
@@ -310,9 +309,9 @@ def trainNetworkOnGPU(max_epoch, x_train_tensor,y_train_tensor,optimizer,lossFun
 
                 optimizer.zero_grad()
 
-                vgg_11_gpu = vgg.cuda()
-                outputs = vgg_11_gpu(inputs)
-                
+                #vgg_11_gpu = vgg.cuda()
+                # outputs = vgg_11_gpu(inputs)
+                outputs = vggInp(inputs)
                 labels = labels.to(device=dev, dtype=torch.int64)
                 
                 loss = lossFun(outputs, labels)
@@ -388,9 +387,10 @@ def main():
     #tracker = PyPads( autostart=True)
     #tracker.start_track(experiment_name="Effect of GPUs - LR Scheduler Experiment")
 
-    torch.manual_seed(0)            # to set same random number to all devices [4]
+    #torch.manual_seed(0)            # to set same random number to all devices [4]
+    
 
-    #device = torch.device("cpu")
+    device = torch.device("cpu")
     max_epoch_num = 150             # Maximun numbe of epochs
 
 
@@ -404,6 +404,27 @@ def main():
     x_test_gpu = []
     y_test_gpu = []
     
+    torch.manual_seed(0)
+    torch.cuda.manual_seed(0)
+    torch.cuda.manual_seed_all(0)
+    np.random.seed(0)
+
+    #vggCpu12345 = copy.deepcopy(VGG_11()).to(device)
+
+    torch.manual_seed(0)
+    torch.cuda.manual_seed(0)
+    torch.cuda.manual_seed_all(0)
+    np.random.seed(0)
+
+
+
+
+
+
+
+
+
+
     if (torch.cuda.is_available()):
 
         device = torch.device('cuda')  
@@ -420,8 +441,8 @@ def main():
             y_test_gpu = torch.FloatTensor(load('/home/rgb/Documents/Thesis_Git/effects-of-cpu-and-gpu-architectures-on-the-accuracy-of-neural-networks/Code/VGG-11/test_label.npy')).cuda()
 
             #Create model class object and store model on GPU
-            vgg11 = VGG_11()
-            vggGpu = vgg11.cuda()
+            #vgg11 = VGG_11()
+            vggGpu = VGG_11().to(device)
 
             #Divide the dataset into small batches'
             x_train_gpu = createBatches(x_train_gpu,batch_size, "cuda")
@@ -438,8 +459,8 @@ def main():
 
             AccuracyOfIndividualClassesAndDataset(x_test_gpu,y_test_gpu,batch_size,vggGpu, "Before")
 
-            optimizer = useOptimizerFunction('SGD',vggGpu, learning_rate=data)
-            #optimizer = useOptimizerFunction('Adadelta',vggGpu, learning_rate=data)
+            #optimizer = useOptimizerFunction('SGD',vggGpu, learning_rate=data)
+            optimizer = useOptimizerFunction('Adadelta',vggGpu, learning_rate=data)
 
 
             pltdata = trainNetworkOnGPU(max_epoch_num, x_train_gpu,y_train_gpu,optimizer,criterion,device,vggGpu)
