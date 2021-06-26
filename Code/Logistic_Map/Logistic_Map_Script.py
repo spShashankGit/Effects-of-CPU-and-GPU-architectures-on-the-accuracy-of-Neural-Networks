@@ -1,6 +1,7 @@
 from pypads.app.base import PyPads                                                  # Import pypads
 import pandas as pd
 import os
+from datetime import datetime  
 path = os.path.expanduser('~')
 
 tracker = PyPads( autostart=True)
@@ -38,6 +39,12 @@ def logisticMapCPU(x,score):
 score_cpu = logisticMapCPU(x_init,score_cpu)
 print('CPU ', score_cpu)
 
+accuracyFileName = "CPU_Logistic_Map" + str(datetime.now())+'.csv'
+#file2write=open(accuracyFileName,'w')
+csvData = score_cpu.to_csv(accuracyFileName,index=False)
+#file2write.write(csvData)
+#file2write.close()
+
 ## ---------------------------------------------------------------- Torch -----------------------------------------------------------------##
 
 import torch # Import PyTorch
@@ -66,3 +73,8 @@ if (torch.cuda.is_available()):
     score_pytorch_gpu = logisticMapPyTorch(x_init, score_pytorch_gpu)               # Calling logisticMapPyTorch function with initial values
 
     print('GPU ',score_pytorch_gpu)
+
+    accuracyFileName = "GPU_Logistic_Map" + str(datetime.now())+'.csv'
+    gpu_Results = score_pytorch_gpu.numpy()
+    gpu_Results = pd.DataFrame(gpu_Results)
+    gpu_Results.to_csv(accuracyFileName)
