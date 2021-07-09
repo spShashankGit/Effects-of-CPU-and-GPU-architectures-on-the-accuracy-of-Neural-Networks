@@ -375,7 +375,7 @@ def main():
     tracker.start_track(experiment_name="Effect of GPUs - VGG 11 - final test run")
 
     #Initializing experiment parametes
-    torch.manual_seed(0)            # to set same random number to all devices [4]
+    #torch.manual_seed(0)            # to set same random number to all devices [4]
     batch_size = 64                 # Batch size
     device = torch.device("cpu")    # Set the torch device to CPU for CPU run
     max_epoch_num = 1             # Maximun numbe of epochs
@@ -405,138 +405,146 @@ def main():
     ytest_filename = os.path.join(dirname, ytest_path)
     y_test = load(ytest_filename)
 
+    seed_value_list = [0,13474,32889,56427,59667] #Seed values selected randomly between 0 and 65536
 
-    #Divide the dataset into small batches
-    x_train = createBatches(x_train,batch_size)
-    y_train = createBatches(y_train,batch_size)
-    x_test = createBatches(x_test,batch_size)
-    y_test = createBatches(y_test,batch_size)
-
-
-    # Convert npArray to tensor
-    x_train_tensor = torch.as_tensor(x_train)
-    y_train_tensor = torch.as_tensor(y_train)
-    x_test_tensor = torch.as_tensor(x_test)
-    y_test_tensor = torch.as_tensor(y_test)
+    for i,seedVal in enumerate(seed_value_list):
+        #Divide the dataset into small batches
+        x_train = createBatches(x_train,batch_size)
+        y_train = createBatches(y_train,batch_size)
+        x_test = createBatches(x_test,batch_size)
+        y_test = createBatches(y_test,batch_size)
 
 
-    # Setting the seed to 0 before running the experiment on CPU
-    torch.manual_seed(0)
-    torch.cuda.manual_seed(0)
-    torch.cuda.manual_seed_all(0)
-    np.random.seed(0)
-
-    # Adadelta Optimizer
-    vggCPU = VGG_11()
-    criterion = useLossFunction()
-    AccuracyOfIndividualClassesAndDataset(x_test_tensor, y_test_tensor, batch_size, vggCPU, 'Before')
-    optimizer=useOptimizerFunction('Adadelta', vggCPU, learning_rate=learning_rate_val)
-    trainNetwork(max_epoch_num, x_train_tensor, y_train_tensor, optimizer, criterion, device, vggCPU, milestoneVal, gammaVal)
-    AccuracyOfIndividualClassesAndDataset(x_test_tensor, y_test_tensor, batch_size, vggCPU, 'After')
-
-    # Setting the seed to 0 after running the experiment on CPU
-    torch.manual_seed(0)
-    torch.cuda.manual_seed(0)
-    torch.cuda.manual_seed_all(0)
-    np.random.seed(0)
-
-    # SGD Optimizer
-    vggCPUSGD = VGG_11()
-    criterion = useLossFunction()
-    AccuracyOfIndividualClassesAndDataset(x_test_tensor, y_test_tensor, batch_size, vggCPUSGD, 'Before')
-    optimizer=useOptimizerFunction('SGD', vggCPUSGD, learning_rate=learning_rate_val)
-    trainNetwork(max_epoch_num, x_train_tensor, y_train_tensor, optimizer, criterion, device, vggCPUSGD, milestoneVal, gammaVal)
-    AccuracyOfIndividualClassesAndDataset(x_test_tensor, y_test_tensor, batch_size, vggCPUSGD, 'After')
-
-    # Setting the seed to 0 after running the experiment on CPU
-    torch.manual_seed(0)
-    torch.cuda.manual_seed(0)
-    torch.cuda.manual_seed_all(0)
-    np.random.seed(0)
-
-    # NAG optimzer
-    vggCPUNAG = VGG_11()
-    criterion = useLossFunction()
-    AccuracyOfIndividualClassesAndDataset(x_test_tensor, y_test_tensor, batch_size, vggCPUNAG, 'Before')
-    optimizer=useOptimizerFunction('NAG', vggCPUNAG, learning_rate=learning_rate_val)
-    trainNetwork(max_epoch_num, x_train_tensor, y_train_tensor, optimizer, criterion, device, vggCPUNAG, milestoneVal, gammaVal)
-    AccuracyOfIndividualClassesAndDataset(x_test_tensor, y_test_tensor, batch_size, vggCPUNAG, 'After')
+        # Convert npArray to tensor
+        x_train_tensor = torch.as_tensor(x_train)
+        y_train_tensor = torch.as_tensor(y_train)
+        x_test_tensor = torch.as_tensor(x_test)
+        y_test_tensor = torch.as_tensor(y_test)
 
 
-    # Setting the seed to 0 after running the experiment on CPU
-    torch.manual_seed(0)
-    torch.cuda.manual_seed(0)
-    torch.cuda.manual_seed_all(0)
-    np.random.seed(0)
+        # Setting the seed value before running the experiment on CPU
+        torch.manual_seed(seedVal)
+        torch.cuda.manual_seed(seedVal)
+        torch.cuda.manual_seed_all(seedVal)
+        np.random.seed(seedVal)
 
-
-    print('Time required to run the model on CPU is', datetime.now() - begin_time)
-
-## ---------------------------------------------------------------- GPU -----------------------------------------------------------------##
-    # If GPU is present run the code on the GPU 
-    begin_time = datetime.now()     # Saving the start time of the GPU 
-    if (torch.cuda.is_available()):
-        
-        print('\n\n ******GPU experiment starts from here*******')
-        device = torch.device('cuda')  
-
-        # Load data from the numpy files into tensor which are stored on GPU
-        x_train_gpu = torch.FloatTensor(load(xtrain_filename)).cuda()
-        y_train_gpu = torch.FloatTensor(load(ytrain_filename)).cuda()
-        x_test_gpu = torch.FloatTensor(load(xtest_filename)).cuda()
-        y_test_gpu = torch.FloatTensor(load(ytest_filename)).cuda()
-        
-
-        #Divide the dataset into small batches'
-        x_train_gpu = createBatches(x_train_gpu,batch_size, "cuda")
-        y_train_gpu = createBatches(y_train_gpu,batch_size, "cuda")
-        x_test_gpu = createBatches(x_test_gpu,batch_size, "cuda")
-        y_test_gpu = createBatches(y_test_gpu,batch_size, "cuda")
-
-
-        # criterion = useLossFunction()
-        # AccuracyOfIndividualClassesAndDataset(x_test_gpu,y_test_gpu,batch_size,vggGpu, "Before")
-        # # optimizer = useOptimizerFunction('SGD',vggGpu, learning_rate=learning_rate_val)
-        # optimizer = useOptimizerFunction('Adadelta',vggGpu, learning_rate=learning_rate_val)
-        # pltdata = trainNetworkOnGPU(max_epoch_num, x_train_gpu,y_train_gpu,optimizer,criterion,device,vggGpu, milestoneVal,gammaVal)
-        # AccuracyOfIndividualClassesAndDataset(x_test_gpu,y_test_gpu,batch_size,vggGpu, "After")
-
-
-        # Adadelta Optimizer - GPU
-        vggGPUAda = VGG_11().cuda()              #Initialize model on GPU
+        # Adadelta Optimizer
+        vggCPU = VGG_11()
         criterion = useLossFunction()
-        AccuracyOfIndividualClassesAndDataset(x_test_gpu, y_test_gpu, batch_size, vggGPUAda, "Before")
-        optimizer=useOptimizerFunction('Adadelta', vggGPUAda, learning_rate=learning_rate_val)
-        trainNetworkOnGPU(max_epoch_num, x_train_gpu, y_train_gpu, optimizer, criterion, device, vggGPUAda, milestoneVal, gammaVal)
-        AccuracyOfIndividualClassesAndDataset(x_test_gpu, y_test_gpu, batch_size, vggGPUAda, "After")
+        AccuracyOfIndividualClassesAndDataset(x_test_tensor, y_test_tensor, batch_size, vggCPU, 'Before')
+        optimizer=useOptimizerFunction('Adadelta', vggCPU, learning_rate=learning_rate_val)
+        trainNetwork(max_epoch_num, x_train_tensor, y_train_tensor, optimizer, criterion, device, vggCPU, milestoneVal, gammaVal)
+        AccuracyOfIndividualClassesAndDataset(x_test_tensor, y_test_tensor, batch_size, vggCPU, 'After')
 
-        # Setting the seed to 0 after running the experiment on CPU
-        torch.manual_seed(0)
-        torch.cuda.manual_seed(0)
-        torch.cuda.manual_seed_all(0)
-        np.random.seed(0)
+        # Setting the seed value before running the experiment on CPU
+        torch.manual_seed(seedVal)
+        torch.cuda.manual_seed(seedVal)
+        torch.cuda.manual_seed_all(seedVal)
+        np.random.seed(seedVal)
 
-        # SGD Optimizer - GPU
-        vggGPUSGD = VGG_11().cuda()              #Initialize model on GPU
+        # SGD Optimizer
+        vggCPUSGD = VGG_11()
         criterion = useLossFunction()
-        AccuracyOfIndividualClassesAndDataset(x_test_gpu, y_test_gpu, batch_size, vggGPUSGD, "Before")
-        optimizer=useOptimizerFunction('SGD', vggGPUSGD, learning_rate=learning_rate_val)
-        trainNetworkOnGPU(max_epoch_num, x_train_gpu, y_train_gpu, optimizer, criterion, device, vggGPUSGD, milestoneVal, gammaVal)
-        AccuracyOfIndividualClassesAndDataset(x_test_gpu, y_test_gpu, batch_size, vggGPUSGD, "After")
+        AccuracyOfIndividualClassesAndDataset(x_test_tensor, y_test_tensor, batch_size, vggCPUSGD, 'Before')
+        optimizer=useOptimizerFunction('SGD', vggCPUSGD, learning_rate=learning_rate_val)
+        trainNetwork(max_epoch_num, x_train_tensor, y_train_tensor, optimizer, criterion, device, vggCPUSGD, milestoneVal, gammaVal)
+        AccuracyOfIndividualClassesAndDataset(x_test_tensor, y_test_tensor, batch_size, vggCPUSGD, 'After')
 
-        # Setting the seed to 0 after running the experiment on CPU
-        torch.manual_seed(0)
-        torch.cuda.manual_seed(0)
-        torch.cuda.manual_seed_all(0)
-        np.random.seed(0)
+        # Setting the seed value before running the experiment on CPU
+        torch.manual_seed(seedVal)
+        torch.cuda.manual_seed(seedVal)
+        torch.cuda.manual_seed_all(seedVal)
+        np.random.seed(seedVal)
 
-        # NAG optimzer - GPU
-        vggGPUNAG = VGG_11().cuda()              #Initialize model on GPU
+        # NAG optimzer
+        vggCPUNAG = VGG_11()
         criterion = useLossFunction()
-        AccuracyOfIndividualClassesAndDataset(x_test_gpu, y_test_gpu, batch_size, vggGPUNAG, "Before")
-        optimizer=useOptimizerFunction('NAG', vggGPUNAG, learning_rate=learning_rate_val)
-        trainNetworkOnGPU(max_epoch_num, x_train_gpu, y_train_gpu, optimizer, criterion, device, vggGPUNAG, milestoneVal, gammaVal)
-        AccuracyOfIndividualClassesAndDataset(x_test_gpu, y_test_gpu, batch_size, vggGPUNAG, "After")
+        AccuracyOfIndividualClassesAndDataset(x_test_tensor, y_test_tensor, batch_size, vggCPUNAG, 'Before')
+        optimizer=useOptimizerFunction('NAG', vggCPUNAG, learning_rate=learning_rate_val)
+        trainNetwork(max_epoch_num, x_train_tensor, y_train_tensor, optimizer, criterion, device, vggCPUNAG, milestoneVal, gammaVal)
+        AccuracyOfIndividualClassesAndDataset(x_test_tensor, y_test_tensor, batch_size, vggCPUNAG, 'After')
+
+
+        # Setting the seed value before running the experiment on CPU
+        torch.manual_seed(seedVal)
+        torch.cuda.manual_seed(seedVal)
+        torch.cuda.manual_seed_all(seedVal)
+        np.random.seed(seedVal)
+
+
+        print('Time required to run the model on CPU is', datetime.now() - begin_time)
+
+    ## ---------------------------------------------------------------- GPU -----------------------------------------------------------------##
+        # If GPU is present run the code on the GPU 
+        begin_time = datetime.now()     # Saving the start time of the GPU 
+        if (torch.cuda.is_available()):
+            
+            print('\n\n ******GPU experiment starts from here*******')
+            device = torch.device('cuda')  
+
+            # Load data from the numpy files into tensor which are stored on GPU
+            x_train_gpu = torch.FloatTensor(load(xtrain_filename)).cuda()
+            y_train_gpu = torch.FloatTensor(load(ytrain_filename)).cuda()
+            x_test_gpu = torch.FloatTensor(load(xtest_filename)).cuda()
+            y_test_gpu = torch.FloatTensor(load(ytest_filename)).cuda()
+            
+
+            #Divide the dataset into small batches'
+            x_train_gpu = createBatches(x_train_gpu,batch_size, "cuda")
+            y_train_gpu = createBatches(y_train_gpu,batch_size, "cuda")
+            x_test_gpu = createBatches(x_test_gpu,batch_size, "cuda")
+            y_test_gpu = createBatches(y_test_gpu,batch_size, "cuda")
+
+
+            # criterion = useLossFunction()
+            # AccuracyOfIndividualClassesAndDataset(x_test_gpu,y_test_gpu,batch_size,vggGpu, "Before")
+            # # optimizer = useOptimizerFunction('SGD',vggGpu, learning_rate=learning_rate_val)
+            # optimizer = useOptimizerFunction('Adadelta',vggGpu, learning_rate=learning_rate_val)
+            # pltdata = trainNetworkOnGPU(max_epoch_num, x_train_gpu,y_train_gpu,optimizer,criterion,device,vggGpu, milestoneVal,gammaVal)
+            # AccuracyOfIndividualClassesAndDataset(x_test_gpu,y_test_gpu,batch_size,vggGpu, "After")
+
+
+            # Adadelta Optimizer - GPU
+            vggGPUAda = VGG_11().cuda()              #Initialize model on GPU
+            criterion = useLossFunction()
+            AccuracyOfIndividualClassesAndDataset(x_test_gpu, y_test_gpu, batch_size, vggGPUAda, "Before")
+            optimizer=useOptimizerFunction('Adadelta', vggGPUAda, learning_rate=learning_rate_val)
+            trainNetworkOnGPU(max_epoch_num, x_train_gpu, y_train_gpu, optimizer, criterion, device, vggGPUAda, milestoneVal, gammaVal)
+            AccuracyOfIndividualClassesAndDataset(x_test_gpu, y_test_gpu, batch_size, vggGPUAda, "After")
+
+            # Setting the seed value after running the experiment on GPU
+            torch.manual_seed(seedVal)
+            torch.cuda.manual_seed(seedVal)
+            torch.cuda.manual_seed_all(seedVal)
+            np.random.seed(seedVal)
+
+            # SGD Optimizer - GPU
+            vggGPUSGD = VGG_11().cuda()              #Initialize model on GPU
+            criterion = useLossFunction()
+            AccuracyOfIndividualClassesAndDataset(x_test_gpu, y_test_gpu, batch_size, vggGPUSGD, "Before")
+            optimizer=useOptimizerFunction('SGD', vggGPUSGD, learning_rate=learning_rate_val)
+            trainNetworkOnGPU(max_epoch_num, x_train_gpu, y_train_gpu, optimizer, criterion, device, vggGPUSGD, milestoneVal, gammaVal)
+            AccuracyOfIndividualClassesAndDataset(x_test_gpu, y_test_gpu, batch_size, vggGPUSGD, "After")
+
+            # Setting the seed value after running the experiment on GPU
+            torch.manual_seed(seedVal)
+            torch.cuda.manual_seed(seedVal)
+            torch.cuda.manual_seed_all(seedVal)
+            np.random.seed(seedVal)
+
+            # NAG optimzer - GPU
+            vggGPUNAG = VGG_11().cuda()              #Initialize model on GPU
+            criterion = useLossFunction()
+            AccuracyOfIndividualClassesAndDataset(x_test_gpu, y_test_gpu, batch_size, vggGPUNAG, "Before")
+            optimizer=useOptimizerFunction('NAG', vggGPUNAG, learning_rate=learning_rate_val)
+            trainNetworkOnGPU(max_epoch_num, x_train_gpu, y_train_gpu, optimizer, criterion, device, vggGPUNAG, milestoneVal, gammaVal)
+            AccuracyOfIndividualClassesAndDataset(x_test_gpu, y_test_gpu, batch_size, vggGPUNAG, "After")
+
+            # Setting the seed value after running the experiment on GPU
+            torch.manual_seed(seedVal)
+            torch.cuda.manual_seed(seedVal)
+            torch.cuda.manual_seed_all(seedVal)
+            np.random.seed(seedVal)
 
 
         #run_loggers.run_teardownPostRunFunction_functions()
