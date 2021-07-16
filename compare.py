@@ -1,8 +1,14 @@
+#importing files
 import pandas as pd
 import subprocess
 import sys
 import os
 
+# reading files
+f1 = open("/root/Experiment/effects-of-cpu-and-gpu-architectures-on-the-accuracy-of-neural-networks/requirements_gpuInfoLogger1.txt", "r")  
+f2 = open("/root/Experiment/effects-of-cpu-and-gpu-architectures-on-the-accuracy-of-neural-networks/pipFreeze.txt", "r")  
+
+#color coding the terminal output
 class bcolors:
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
@@ -13,10 +19,6 @@ class bcolors:
     ENDC = '\033[0m'
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
-
-# reading files
-f1 = open("/root/Experiment/effects-of-cpu-and-gpu-architectures-on-the-accuracy-of-neural-networks/requirements_gpuInfoLogger1.txt", "r")  
-f2 = open("/root/Experiment/effects-of-cpu-and-gpu-architectures-on-the-accuracy-of-neural-networks/pipFreeze.txt", "r")  
 
 def createDictionaryObject(fileName):
     i = 0
@@ -31,7 +33,29 @@ def createDictionaryObject(fileName):
             i += 1  
     return packageList
 
+def upgrade(package,version):
+    try:
+        pkgWithVersion = package + "==" + version
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "--upgrade", pkgWithVersion])
+    
+    except subprocess.CalledProcessError as e:
+        raise RuntimeError("command 123 '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))
 
+def install(package,version):
+    try:
+        pkgWithVersion = package + "==" + version
+        subprocess.check_call([sys.executable, "-m", "pip", "install", pkgWithVersion])
+    
+    except subprocess.CalledProcessError as e:
+        raise RuntimeError("command 123 '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))
+
+def uninstall(package):
+    try:
+        pkgWithVersion = package
+        subprocess.check_call([sys.executable, "-m", "pip", "uninstall", pkgWithVersion])
+    
+    except subprocess.CalledProcessError as e:
+        raise RuntimeError("command 123 '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))
 
 refDict = createDictionaryObject(f1)
 underVeriDict = createDictionaryObject(f2)
@@ -94,46 +118,23 @@ for i in conflictingPackages:
 
 
 print(f"{bcolors.FAIL}Warning: total", len(packageNotFound), "packages were found on the local machine but are not on the reference list")
-print(f"\n{bcolors.FAIL}Package Name \t\t\t\t\t   Version")
+print(f"\n{bcolors.FAIL}Package Name \t\t\t\t\t   Version{bcolors.ENDC}")
 for i in packageNotFound:
     print("%-*s %-*s"%((50,i[0],20,i[1])))
 
 
-
-
-def install(package,version):
-    try:
-        pkgWithVersion = package + "==" + version
-        subprocess.check_call([sys.executable, "-m", "pip", "install", pkgWithVersion])
-    
-    except subprocess.CalledProcessError as e:
-        raise RuntimeError("command 123 '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))
-
-def uninstall(package,version):
-    try:
-        pkgWithVersion = package + "==" + version
-        subprocess.check_call([sys.executable, "-m", "pip", "uninstall", pkgWithVersion])
-    
-    except subprocess.CalledProcessError as e:
-        raise RuntimeError("command 123 '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))
-
-
-## write a code to reinstall the packages with the correct version
+## write code to reinstall the packages with the correct version
 print("Reinstalling....")
 
 for i in conflictingPackages:
     print(" %-s version %-s"%((i[0],i[1])))
-    createCondaCommand = "conda install "+i[0]+"="+i[1]
-    createPipCommand = "python3 -m pip install "+i[0]+"="+i[1]
-    #os.system('ls -l')
-    print('Uninstalling ', i[0], 'with version ', i[2])
-    uninstall(i[0],i[1])
-    print("Installing",i[0]," version = ", i[1])
-    install(i[0],i[1])
+    upgrade(i[0],i[1])
 
 ## write code to remove the packages which are found extra on the local machine.abs
-#"pip freeze | grep numpy"
-
+print("Removing packages that are not extra..")
+for i in packageNotFound:
+    print(" %-s version %-s"%((i[0],i[1])))
+    uninstall(i[0])
 
 
 #Closing the file
