@@ -20,7 +20,7 @@ pip3 install -r requirements_gpuInfoLogger1.tx -y
 
 
 # Install pycuda via pip
-python3 -m pip install pycuda==2020.1
+python3 -m pip3 install pycuda==2020.1
 
 
 # Install pytorch 
@@ -47,13 +47,16 @@ python3 --version
 #https://medium.com/analytics-vidhya/installing-python-3-8-3-66701d3db134
 
 
+# Install pypads
+python3 -m pip3 install Code/PyPads_GPU_Details_Logger/dist/pypads-0.5.7_with_env_variable.tar.gz
+
+
 # Check if all packages are installed correctly
-pip freeze >> pipFreeze.txt
+pip3 freeze >> pipFreeze.txt
 python3 compare.py
 
 
 # Steps to run the experiment
-# python3 -m pip install Code/PyPads_GPU_Details_Logger/dist/pypads-0.5.7_with_env_variable.tar.gz
 # python3 Code/Logistic_Map/Logistic_Map_Script.py
 # python3 Code/VGG-11/vgg_numpy.py
 
