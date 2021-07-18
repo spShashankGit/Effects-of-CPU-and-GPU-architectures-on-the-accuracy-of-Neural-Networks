@@ -51,9 +51,9 @@ python3 compare.py
 
 
 # Steps to run the experiment
-python3 -m pip install Code/PyPads_GPU_Details_Logger/dist/pypads-0.5.7_with_env_variable.tar.gz
-python3 Code/Logistic_Map/Logistic_Map_Script.py
-python3 Code/VGG-11/vgg_numpy.py
+# python3 -m pip install Code/PyPads_GPU_Details_Logger/dist/pypads-0.5.7_with_env_variable.tar.gz
+# python3 Code/Logistic_Map/Logistic_Map_Script.py
+# python3 Code/VGG-11/vgg_numpy.py
 
 
 # Now install pypads from dist
