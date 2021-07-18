@@ -11,7 +11,7 @@ tracker.start_track(experiment_name="Effect of GPUs - Logistic map - stg7")
 x_init = 0.4                                                                        # Initial valur of the X or X_0
 max_iteration = 2000                                                                # Max number of iterations
 r = 3.7                                                                             # Rate of reproduction
-seed_value_list = [0,13474,32889,56427,59667]                                       # Seed values selected randomly between 0 and 65536
+seed_value_list = [7184,13474,32889,56427,59667]                                       # Seed values selected randomly between 0 and 65536
 
 ## ---------------------------------------------------------------- CPU -----------------------------------------------------------------##
 
