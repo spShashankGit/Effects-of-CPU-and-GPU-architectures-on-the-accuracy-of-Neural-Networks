@@ -405,7 +405,7 @@ def main():
     ytest_filename = os.path.join(dirname, ytest_path)
     y_test = load(ytest_filename)
 
-    seed_value_list = [0,13474,32889,56427,59667] #Seed values selected randomly between 0 and 65536
+    seed_value_list = [7184,13474,32889,56427,59667] #Seed values selected randomly between 0 and 65536
 
     for i,seedVal in enumerate(seed_value_list):
         #Divide the dataset into small batches
