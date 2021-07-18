@@ -15,7 +15,9 @@ cd $APP_NAME
 #conda activate thesisExpCondaEnv_P38
 
 # Install conda packages from the req file
-pip install --file requirements_gpuInfoLogger1.txt -y
+#conda install --file requirements_gpuInfoLogger1.txt -y
+pip install -r requirements_gpuInfoLogger1.tx -y
+
 
 # Install pycuda via pip
 python3 -m pip install pycuda==2020.1
