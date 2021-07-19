@@ -1,11 +1,11 @@
 #!/bin/bash
 
 # Directory name
-APP_NAME="thesis_experiment_shashank"
+# APP_NAME="thesis_experiment_shashank"
 
-cd
-mkdir $APP_NAME
-cd $APP_NAME
+# cd
+# mkdir $APP_NAME
+# cd $APP_NAME
 
 # Create and activate conda env with with python 3.6
 #conda create -n thesisExpCondaEnv python=3.6
