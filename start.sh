@@ -1,12 +1,5 @@
 #!/bin/bash
 
-# Directory name
-# APP_NAME="thesis_experiment_shashank"
-
-# cd
-# mkdir $APP_NAME
-# cd $APP_NAME
-
 # Create and activate conda env with with python 3.6
 #conda create -n thesisExpCondaEnv python=3.6
 #conda activate thesisExpCondaEnv 
@@ -47,7 +40,7 @@ python3 --version
 #https://medium.com/analytics-vidhya/installing-python-3-8-3-66701d3db134
 
 
-# Install pypads
+# Install pypads from dist
 python3 -m pip3 install Code/PyPads_GPU_Details_Logger/dist/pypads-0.5.7_with_env_variable.tar.gz
 
 
@@ -61,5 +54,4 @@ python3 compare.py
 # python3 Code/VGG-11/vgg_numpy.py
 
 
-# Now install pypads from dist
 echo "Script completed"
