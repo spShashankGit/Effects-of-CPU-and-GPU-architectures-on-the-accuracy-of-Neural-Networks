@@ -16,7 +16,7 @@
 
 # Install conda packages from the req file
 #conda install --file requirements_gpuInfoLogger1.txt -y
-pip3 install -r requirements_gpuInfoLogger1.tx -y
+pip3 install -r requirements_gpuInfoLogger1.txt
 
 
 # Install pycuda via pip
@@ -24,7 +24,7 @@ python3 -m pip3 install pycuda==2020.1
 
 
 # Install pytorch 
-pip3 install -c pytorch 
+pip3 install torch 
 
 
 # Set environment variables for pypads logging
