@@ -9,7 +9,7 @@
 
 # Install conda packages from the req file
 #conda install --file requirements_gpuInfoLogger1.txt -y
-pip3 install -r requirements_gpuInfoLogger1.txt
+pip3 install -r referenceRer.txt
 
 
 # Install pycuda via pip
@@ -50,8 +50,8 @@ python3 compare.py
 
 
 # Steps to run the experiment
-# python3 Code/Logistic_Map/Logistic_Map_Script.py
-# python3 Code/VGG-11/vgg_numpy.py
+python3 Code/Logistic_Map/Logistic_Map_Script.py
+python3 Code/VGG-11/vgg_numpy.py
 
 
 echo "Script completed"
