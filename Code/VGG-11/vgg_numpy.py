@@ -359,7 +359,7 @@ def AccuracyOfIndividualClassesAndDataset(x_test_t,y_test_t,bs,vgg,msg):
         file2write.write(str('Accuracy of %5s : %.2f %% \n' % (
             classes[i], 100 * class_correct[i] / class_total[i])))
     
-    print('Accuracy of the network on the %d test images: %.2f %%' % (len(y_test_t)*bs,100 * correct / total))
+    print('Accuracy of the network on the %d test images: %.2f %% \n' % (len(y_test_t)*bs,100 * correct / total))
     file2write.write(('Accuracy of the network on the %d test images: %.2f %% \n' % (len(y_test_t)*bs,100 * correct / total)))
     #file2write.write(str(pltdata))
     file2write.close()
@@ -372,7 +372,7 @@ def main():
     
     # Initializing pypads
     tracker = PyPads( autostart=True)
-    tracker.start_track(experiment_name="Effect of GPUs - VGG 11 - final test run")
+    tracker.start_track(experiment_name="Effect of GPUs - VGG 11 - final test run - trail 4")
 
     #Initializing experiment parametes
     #torch.manual_seed(0)            # to set same random number to all devices [4]
@@ -394,25 +394,26 @@ def main():
     dirname = os.path.dirname(__file__)
     
     xtrain_filename = os.path.join(dirname, xtrain_path)
-    x_train = load(xtrain_filename)
+    x_train_data = load(xtrain_filename)
 
     ytrain_filename = os.path.join(dirname, ytrain_path)
-    y_train = load(ytrain_filename)
+    y_train_data = load(ytrain_filename)
     
     xtest_filename = os.path.join(dirname, xtest_path)
-    x_test = load(xtest_filename)
+    x_test_data = load(xtest_filename)
     
     ytest_filename = os.path.join(dirname, ytest_path)
-    y_test = load(ytest_filename)
+    y_test_data = load(ytest_filename)
 
     seed_value_list = [7184,13474,32889,56427,59667] #Seed values selected randomly between 0 and 65536
 
     for i,seedVal in enumerate(seed_value_list):
+        print('%d Seed value %d'%(i, seedVal))
         #Divide the dataset into small batches
-        x_train = createBatches(x_train,batch_size)
-        y_train = createBatches(y_train,batch_size)
-        x_test = createBatches(x_test,batch_size)
-        y_test = createBatches(y_test,batch_size)
+        x_train = createBatches(x_train_data,batch_size)
+        y_train = createBatches(y_train_data,batch_size)
+        x_test = createBatches(x_test_data,batch_size)
+        y_test = createBatches(y_test_data,batch_size)
 
 
         # Convert npArray to tensor
@@ -431,10 +432,12 @@ def main():
         # Adadelta Optimizer
         vggCPU = VGG_11()
         criterion = useLossFunction()
-        AccuracyOfIndividualClassesAndDataset(x_test_tensor, y_test_tensor, batch_size, vggCPU, 'Before')
+        msgBefore = "Before - CPU \n Seed value is " + str(seedVal) + "\n Optimizer = Adadelta"
+        AccuracyOfIndividualClassesAndDataset(x_test_tensor, y_test_tensor, batch_size, vggCPU, msgBefore)
         optimizer=useOptimizerFunction('Adadelta', vggCPU, learning_rate=learning_rate_val)
         trainNetwork(max_epoch_num, x_train_tensor, y_train_tensor, optimizer, criterion, device, vggCPU, milestoneVal, gammaVal)
-        AccuracyOfIndividualClassesAndDataset(x_test_tensor, y_test_tensor, batch_size, vggCPU, 'After')
+        msgAfter = "After - CPU \n Seed value is " + str(seedVal) + "\n Optimizer = Adadelta"
+        AccuracyOfIndividualClassesAndDataset(x_test_tensor, y_test_tensor, batch_size, vggCPU, msgAfter)
 
         # Setting the seed value before running the experiment on CPU
         torch.manual_seed(seedVal)
@@ -445,10 +448,12 @@ def main():
         # SGD Optimizer
         vggCPUSGD = VGG_11()
         criterion = useLossFunction()
-        AccuracyOfIndividualClassesAndDataset(x_test_tensor, y_test_tensor, batch_size, vggCPUSGD, 'Before')
+        msgBefore = "Before - CPU \n Seed value is " + str(seedVal) + "\n Optimizer = SGD"
+        AccuracyOfIndividualClassesAndDataset(x_test_tensor, y_test_tensor, batch_size, vggCPUSGD, msgBefore)
         optimizer=useOptimizerFunction('SGD', vggCPUSGD, learning_rate=learning_rate_val)
         trainNetwork(max_epoch_num, x_train_tensor, y_train_tensor, optimizer, criterion, device, vggCPUSGD, milestoneVal, gammaVal)
-        AccuracyOfIndividualClassesAndDataset(x_test_tensor, y_test_tensor, batch_size, vggCPUSGD, 'After')
+        msgAfter = "After - CPU \n Seed value is " + str(seedVal) + "\n Optimizer = SGD"
+        AccuracyOfIndividualClassesAndDataset(x_test_tensor, y_test_tensor, batch_size, vggCPUSGD, msgAfter)
 
         # Setting the seed value before running the experiment on CPU
         torch.manual_seed(seedVal)
@@ -459,10 +464,12 @@ def main():
         # NAG optimzer
         vggCPUNAG = VGG_11()
         criterion = useLossFunction()
-        AccuracyOfIndividualClassesAndDataset(x_test_tensor, y_test_tensor, batch_size, vggCPUNAG, 'Before')
+        msgBefore = "Before - CPU \n Seed value is " + str(seedVal) + "\n Optimizer = NAG"
+        AccuracyOfIndividualClassesAndDataset(x_test_tensor, y_test_tensor, batch_size, vggCPUNAG, msgBefore)
         optimizer=useOptimizerFunction('NAG', vggCPUNAG, learning_rate=learning_rate_val)
         trainNetwork(max_epoch_num, x_train_tensor, y_train_tensor, optimizer, criterion, device, vggCPUNAG, milestoneVal, gammaVal)
-        AccuracyOfIndividualClassesAndDataset(x_test_tensor, y_test_tensor, batch_size, vggCPUNAG, 'After')
+        msgAfter = "After - CPU \n Seed value is " + str(seedVal) + "\n Optimizer = NAG"
+        AccuracyOfIndividualClassesAndDataset(x_test_tensor, y_test_tensor, batch_size, vggCPUNAG, msgAfter)
 
 
         # Setting the seed value before running the experiment on CPU
@@ -474,7 +481,7 @@ def main():
 
         print('Time required to run the model on CPU is', datetime.now() - begin_time)
 
-    ## ---------------------------------------------------------------- GPU -----------------------------------------------------------------##
+        ## ---------------------------------------------------------------- GPU -----------------------------------------------------------------##
         # If GPU is present run the code on the GPU 
         begin_time = datetime.now()     # Saving the start time of the GPU 
         if (torch.cuda.is_available()):
@@ -507,10 +514,12 @@ def main():
             # Adadelta Optimizer - GPU
             vggGPUAda = VGG_11().cuda()              #Initialize model on GPU
             criterion = useLossFunction()
-            AccuracyOfIndividualClassesAndDataset(x_test_gpu, y_test_gpu, batch_size, vggGPUAda, "Before")
+            msgBefore = "Before - GPU \n Seed value is " + str(seedVal) + "\n Optimizer = Adadelta"
+            AccuracyOfIndividualClassesAndDataset(x_test_gpu, y_test_gpu, batch_size, vggGPUAda, msgBefore)
             optimizer=useOptimizerFunction('Adadelta', vggGPUAda, learning_rate=learning_rate_val)
             trainNetworkOnGPU(max_epoch_num, x_train_gpu, y_train_gpu, optimizer, criterion, device, vggGPUAda, milestoneVal, gammaVal)
-            AccuracyOfIndividualClassesAndDataset(x_test_gpu, y_test_gpu, batch_size, vggGPUAda, "After")
+            msgAfter = "After - GPU \n Seed value is " + str(seedVal) + "\n Optimizer = Adadelta"
+            AccuracyOfIndividualClassesAndDataset(x_test_gpu, y_test_gpu, batch_size, vggGPUAda, msgAfter)
 
             # Setting the seed value after running the experiment on GPU
             torch.manual_seed(seedVal)
@@ -521,10 +530,12 @@ def main():
             # SGD Optimizer - GPU
             vggGPUSGD = VGG_11().cuda()              #Initialize model on GPU
             criterion = useLossFunction()
-            AccuracyOfIndividualClassesAndDataset(x_test_gpu, y_test_gpu, batch_size, vggGPUSGD, "Before")
+            msgBefore = "Before - GPU \n Seed value is " + str(seedVal) + "\n Optimizer = SGD"
+            AccuracyOfIndividualClassesAndDataset(x_test_gpu, y_test_gpu, batch_size, vggGPUSGD, msgBefore)
             optimizer=useOptimizerFunction('SGD', vggGPUSGD, learning_rate=learning_rate_val)
             trainNetworkOnGPU(max_epoch_num, x_train_gpu, y_train_gpu, optimizer, criterion, device, vggGPUSGD, milestoneVal, gammaVal)
-            AccuracyOfIndividualClassesAndDataset(x_test_gpu, y_test_gpu, batch_size, vggGPUSGD, "After")
+            msgAfter = "After - GPU \n Seed value is " + str(seedVal) + "\n Optimizer = SGD"
+            AccuracyOfIndividualClassesAndDataset(x_test_gpu, y_test_gpu, batch_size, vggGPUSGD, msgAfter)
 
             # Setting the seed value after running the experiment on GPU
             torch.manual_seed(seedVal)
@@ -535,10 +546,12 @@ def main():
             # NAG optimzer - GPU
             vggGPUNAG = VGG_11().cuda()              #Initialize model on GPU
             criterion = useLossFunction()
-            AccuracyOfIndividualClassesAndDataset(x_test_gpu, y_test_gpu, batch_size, vggGPUNAG, "Before")
+            msgBefore = "Before - GPU \n Seed value is " + str(seedVal) + "\n Optimizer = NAG"
+            AccuracyOfIndividualClassesAndDataset(x_test_gpu, y_test_gpu, batch_size, vggGPUNAG, msgBefore)
             optimizer=useOptimizerFunction('NAG', vggGPUNAG, learning_rate=learning_rate_val)
             trainNetworkOnGPU(max_epoch_num, x_train_gpu, y_train_gpu, optimizer, criterion, device, vggGPUNAG, milestoneVal, gammaVal)
-            AccuracyOfIndividualClassesAndDataset(x_test_gpu, y_test_gpu, batch_size, vggGPUNAG, "After")
+            msgAfter = "After - GPU \n Seed value is " + str(seedVal) + "\n Optimizer = NAG"
+            AccuracyOfIndividualClassesAndDataset(x_test_gpu, y_test_gpu, batch_size, vggGPUNAG, msgAfter)
 
             # Setting the seed value after running the experiment on GPU
             torch.manual_seed(seedVal)
@@ -547,8 +560,13 @@ def main():
             np.random.seed(seedVal)
 
 
-        #run_loggers.run_teardownPostRunFunction_functions()
-        print('Time required to run the model on GPU is', datetime.now() - begin_time) # Time taken to run the experiment on GPU
+            #run_loggers.run_teardownPostRunFunction_functions()
+            print('Time required to run the model on GPU is', datetime.now() - begin_time) # Time taken to run the experiment on GPU
+        
+
+        else:
+            print('GPU is not present')
+        
         print('END')
 
 if __name__ == "__main__":
