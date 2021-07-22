@@ -378,7 +378,7 @@ def main():
     #torch.manual_seed(0)            # to set same random number to all devices [4]
     batch_size = 64                 # Batch size
     device = torch.device("cpu")    # Set the torch device to CPU for CPU run
-    max_epoch_num = 1             # Maximun numbe of epochs
+    max_epoch_num = 150             # Maximun numbe of epochs
     learning_rate_val = 0.1         # Learning rate
     milestoneVal = [50,75,100,125]  # Milestones values for Learning Rate Scheduler
     gammaVal = 0.8                  # Gamma value the Learning Rate  Scheduler
