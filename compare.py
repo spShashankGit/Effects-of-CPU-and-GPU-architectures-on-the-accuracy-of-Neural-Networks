@@ -10,7 +10,7 @@ referenceFilePath = 'pipFreezeZaire.txt'
 fullReferenceFilePath = os.path.join(dirname, referenceFilePath)
 f1 = open(fullReferenceFilePath, "r")  
 
-localFilePath = 'pipFreezeLocal.txt'
+localFilePath = 'pipFreeze.txt'
 fullLocalFilePath = os.path.join(dirname, localFilePath)
 f2 = open(fullLocalFilePath, "r")  
 
@@ -46,7 +46,7 @@ def createDictionaryObject(fileName):
 def upgrade(package,version):
     try:
         pkgWithVersion = package + "==" + version
-        subprocess.check_call([sys.executable, "-m", "pip3", "install", "--upgrade", pkgWithVersion])
+        subprocess.check_call(["pip3", "install", "--upgrade", pkgWithVersion])
     
     except subprocess.CalledProcessError as e:
         raise RuntimeError("command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))
@@ -54,14 +54,14 @@ def upgrade(package,version):
 def install(package,version):
     try:
         pkgWithVersion = package + "==" + version
-        subprocess.check_call([sys.executable, "-m", "pip3", "install", pkgWithVersion])
+        subprocess.check_call(["pip3", "install", pkgWithVersion])
     
     except subprocess.CalledProcessError as e:
         raise RuntimeError("command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))
 
 def uninstall(package):
     try:
-        subprocess.check_call([sys.executable, "-m", "pip3", "uninstall", package])
+        subprocess.check_call(["pip3", "uninstall", package])
     
     except subprocess.CalledProcessError as e:
         raise RuntimeError("command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))
@@ -73,7 +73,6 @@ def checkIfThePackagesAreSame():
     # Converting data dictionary to data frame
     refDict = pd.DataFrame(refDict)
     underVeriDict = pd.DataFrame(underVeriDict)
-
 
     for j in range(len(underVeriDict)):
         # Check if the local package is available in the reference list.
@@ -139,18 +138,18 @@ if(len(packageNotFound)>=1):
     print("Removing packages that are extra..")
     for i in packageNotFound:
         print(" %-s version %-s"%((i[0],i[1])))
-        #uninstall(i[0])
+        uninstall(i[0])
 
 # Confirm all packages are installed correctly and environment is safe to run the experiment!
-packageNotFound,compatiblePackages,conflictingPackages = checkIfThePackagesAreSame()
+#packageNotFound,compatiblePackages,conflictingPackages = checkIfThePackagesAreSame()
 
-if(len(packageNotFound)==0 and len(compatiblePackages)==0 and len(conflictingPackages)==0):
-    print("Environment is configured correctly.")
-    print("Environment is ready.")
+# if(len(packageNotFound)==0 and len(compatiblePackages)==0 and len(conflictingPackages)==0):
+#     print("Environment is configured correctly.")
+#     print("Environment is ready.")
 
-else:
-    print("Environment is still not ready.")
-    print("Hint: run 'python3 compare.py' again in terminal")
+# else:
+#     print("Environment is still not ready.")
+#     print("Hint: run 'python3 compare.py' again in terminal")
 
 # Closing the file
 f1.close()                                       
