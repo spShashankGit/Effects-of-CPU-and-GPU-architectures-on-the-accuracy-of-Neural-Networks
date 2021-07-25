@@ -6,11 +6,11 @@ import os
 
 # Reading files
 dirname = os.path.dirname(__file__)
-referenceFilePath = 'requirements_gpuInfoLogger1.txt'
+referenceFilePath = 'pipFreezeZaire.txt'
 fullReferenceFilePath = os.path.join(dirname, referenceFilePath)
 f1 = open(fullReferenceFilePath, "r")  
 
-localFilePath = 'pipFreeze.txt'
+localFilePath = 'pipFreezeLocal.txt'
 fullLocalFilePath = os.path.join(dirname, localFilePath)
 f2 = open(fullLocalFilePath, "r")  
 
@@ -49,7 +49,7 @@ def upgrade(package,version):
         subprocess.check_call([sys.executable, "-m", "pip3", "install", "--upgrade", pkgWithVersion])
     
     except subprocess.CalledProcessError as e:
-        raise RuntimeError("command 123 '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))
+        raise RuntimeError("command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))
 
 def install(package,version):
     try:
@@ -57,7 +57,7 @@ def install(package,version):
         subprocess.check_call([sys.executable, "-m", "pip3", "install", pkgWithVersion])
     
     except subprocess.CalledProcessError as e:
-        raise RuntimeError("command 123 '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))
+        raise RuntimeError("command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))
 
 def uninstall(package):
     try:
@@ -109,7 +109,7 @@ print("Total", len(compatiblePackages), "packages matches with the requirement")
 if(len(conflictingPackages) >=1):
 
     print("Warning: total", len(conflictingPackages), "packages did not match with the requirement")
-    print(f"{bcolors.WARNING}Package Name \t\t Expected Version \t\t Actual Version")
+    print(f"{bcolors.WARNING}Package Name \t\t Expected Version \t\t Actual Version {bcolors.ENDC}")
     for i in conflictingPackages:
         print("%-*s  %-*s  %s"%((23,i[0], 30,i[1], i[2])))
 else:
@@ -118,8 +118,8 @@ else:
 
 # Print extra packages 
 if(len(packageNotFound)>=1):
-    print(f"{bcolors.FAIL}Warning: total", len(packageNotFound), "packages were found on the local machine but are not on the reference list{bcolors.ENDC}")
-    print(f"\n{bcolors.FAIL}Package Name \t\t\t\t\t   Version")
+    print(f"{bcolors.FAIL}Warning: total", len(packageNotFound), "packages were found on the local machine but are not on the reference list {bcolors.ENDC}")
+    print(f"\n{bcolors.FAIL}Package Name \t\t\t\t\t   Version {bcolors.ENDC}")
     for i in packageNotFound:
         print("%-*s %-*s"%((50,i[0],20,i[1])))
 else:
@@ -139,7 +139,7 @@ if(len(packageNotFound)>=1):
     print("Removing packages that are extra..")
     for i in packageNotFound:
         print(" %-s version %-s"%((i[0],i[1])))
-        uninstall(i[0])
+        #uninstall(i[0])
 
 # Confirm all packages are installed correctly and environment is safe to run the experiment!
 packageNotFound,compatiblePackages,conflictingPackages = checkIfThePackagesAreSame()
