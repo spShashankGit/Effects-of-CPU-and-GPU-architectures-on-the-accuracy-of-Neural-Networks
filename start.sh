@@ -9,11 +9,11 @@
 
 # Install conda packages from the req file
 #conda install --file requirements_gpuInfoLogger1.txt -y
-pip3 install -r referenceRer.txt
+pip3 install -r pipFreezeZaire.txt
 
 
 # Install pycuda via pip
-python3 -m pip3 install pycuda==2020.1
+pip3 install pycuda==2020.1
 
 
 # Install pytorch 
@@ -28,12 +28,12 @@ export MONGO_PW=8CN7OqknwhYr3RO;
 
 
 # Update to Python 3.8.0
-apt update
-sudo apt install software-properties-common
-add-apt-repository ppa:deadsnakes/ppa
-apt update
-apt install python3.8
-python3 --version
+# apt update
+# sudo apt install software-properties-common
+# add-apt-repository ppa:deadsnakes/ppa
+# apt update
+# apt install python3.8
+# python3 --version
 
 #.bashrc
 #alias="/usr/bin/python3.8"
@@ -45,7 +45,7 @@ python3 -m pip3 install Code/PyPads_GPU_Details_Logger/dist/pypads-0.5.7_with_en
 
 
 # Check if all packages are installed correctly
-pip3 freeze >> pipFreeze.txt
+pip3 freeze > pipFreeze.txt
 python3 compare.py
 
 
