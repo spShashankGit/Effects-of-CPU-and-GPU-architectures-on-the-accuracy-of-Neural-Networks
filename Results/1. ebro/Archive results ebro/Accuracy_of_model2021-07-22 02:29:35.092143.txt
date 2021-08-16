@@ -1,0 +1,14 @@
+After - CPU 
+ Seed value is 13474
+ Optimizer = NAG
+Accuracy of plane : 72.73 % 
+Accuracy of   car : 68.00 % 
+Accuracy of  bird : 18.99 % 
+Accuracy of   cat : 27.40 % 
+Accuracy of  deer : 29.09 % 
+Accuracy of   dog : 43.10 % 
+Accuracy of  frog : 60.71 % 
+Accuracy of horse : 65.08 % 
+Accuracy of  ship : 50.88 % 
+Accuracy of truck : 43.59 % 
+Accuracy of the network on the 9984 test images: 48.73 % 

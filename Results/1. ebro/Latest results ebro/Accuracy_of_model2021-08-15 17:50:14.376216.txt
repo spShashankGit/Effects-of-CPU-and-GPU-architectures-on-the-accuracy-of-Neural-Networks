@@ -1,0 +1,14 @@
+After - CPU 
+ Seed value is 13474
+ Optimizer = SGD
+Accuracy of plane : 92.73 % 
+Accuracy of   car : 88.00 % 
+Accuracy of  bird : 82.28 % 
+Accuracy of   cat : 60.27 % 
+Accuracy of  deer : 81.82 % 
+Accuracy of   dog : 81.03 % 
+Accuracy of  frog : 82.14 % 
+Accuracy of horse : 92.06 % 
+Accuracy of  ship : 87.72 % 
+Accuracy of truck : 85.90 % 
+Accuracy of the network on the 9984 test images: 84.32 % 
