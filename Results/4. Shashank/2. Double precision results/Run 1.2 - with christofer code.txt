@@ -1,0 +1,33 @@
+Run 1.2  - with christofer code
+
+Before: Printing accuracy of the model
+Accuracy of plane : 21.20 %
+Accuracy of   car : 1.80 %
+Accuracy of  bird : 10.50 %
+Accuracy of   cat : 0.10 %
+Accuracy of  deer : 0.20 %
+Accuracy of   dog : 0.90 %
+Accuracy of  frog : 66.00 %
+Accuracy of horse : 0.40 %
+Accuracy of  ship : 0.00 %
+Accuracy of truck : 0.30 %
+Accuracy of the network on the 10000 test images: 10.14 % 
+
+Loss: 0 : 2.378253134353198
+Loss: 1 : 1.8463912166603065
+Loss: 2 : 1.6219170998344175
+Loss: 3 : 1.3722088341162513
+Loss: 4 : 1.1623834783487677
+Finished Training on GPU
+After: Printing accuracy of the model
+Accuracy of plane : 58.20 %
+Accuracy of   car : 60.40 %
+Accuracy of  bird : 66.90 %
+Accuracy of   cat : 35.30 %
+Accuracy of  deer : 27.40 %
+Accuracy of   dog : 32.20 %
+Accuracy of  frog : 87.20 %
+Accuracy of horse : 16.50 %
+Accuracy of  ship : 39.30 %
+Accuracy of truck : 30.20 %
+Accuracy of the network on the 10000 test images: 45.36 % 

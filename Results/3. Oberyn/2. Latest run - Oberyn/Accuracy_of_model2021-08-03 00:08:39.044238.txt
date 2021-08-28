@@ -1,0 +1,14 @@
+After - CPU 
+ Seed value is 32889
+ Optimizer = Adadelta
+Accuracy of plane : 90.91 % 
+Accuracy of   car : 90.00 % 
+Accuracy of  bird : 74.68 % 
+Accuracy of   cat : 53.42 % 
+Accuracy of  deer : 83.64 % 
+Accuracy of   dog : 82.76 % 
+Accuracy of  frog : 94.64 % 
+Accuracy of horse : 84.13 % 
+Accuracy of  ship : 92.98 % 
+Accuracy of truck : 85.90 % 
+Accuracy of the network on the 9984 test images: 83.14 % 
