@@ -77,7 +77,7 @@ for i,seedVal in enumerate(seed_value_list):
         print(torch.cuda.get_device_name(torch.cuda.current_device()))
         cuda = torch.device('cuda')                                                     # Setting default CUDA device
 
-        score_pytorch_gpu = torch.empty((max_iteration,1),dtype=torch.float32)          # Initialize Tensor on GPU
+        score_pytorch_gpu = torch.empty((max_iteration,1),dtype=torch.double)          # Initialize Tensor on GPU
 
         score_pytorch_gpu = logisticMapPyTorch(x_init, score_pytorch_gpu)               # Calling logisticMapPyTorch function with initial values
 
