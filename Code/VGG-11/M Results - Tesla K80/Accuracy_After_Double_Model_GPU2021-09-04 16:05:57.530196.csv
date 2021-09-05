@@ -1,0 +1,4 @@
+
+Accuracy of truck : 87.60 % 
+Accuracy of the network on the 10000 test images: 81.09 % 
+Time required to run the model on GPU is 6:37:35.644799 
