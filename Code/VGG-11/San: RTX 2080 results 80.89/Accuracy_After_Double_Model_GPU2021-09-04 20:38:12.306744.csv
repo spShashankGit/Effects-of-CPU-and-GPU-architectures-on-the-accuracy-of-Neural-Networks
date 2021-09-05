@@ -1,0 +1,13 @@
+
+Accuracy of plane : 85.70 % 
+Accuracy of   car : 89.50 % 
+Accuracy of  bird : 71.80 % 
+Accuracy of   cat : 62.40 % 
+Accuracy of  deer : 79.40 % 
+Accuracy of   dog : 74.20 % 
+Accuracy of  frog : 86.90 % 
+Accuracy of horse : 83.70 % 
+Accuracy of  ship : 87.70 % 
+Accuracy of truck : 87.60 % 
+Accuracy of the network on the 10000 test images: 80.89 % 
+Time required to run the model on GPU is 10:37:35.660612 
